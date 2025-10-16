@@ -33,6 +33,11 @@ class LowonganController extends Controller
             ],
         ];
 
-        return view('welcome.blade.php', compact('lowongan'));
+        return view('home', compact('lowongan'));
+    }
+        public function loginform()
+    {
+
+        return view('login');
     }
 }
