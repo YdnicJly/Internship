@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Position;
 use App\Models\Application;
+use App\Models\Interview;
 use Illuminate\Http\Request;
 
 class AdminDashboardController extends Controller
@@ -13,7 +14,7 @@ class AdminDashboardController extends Controller
     {
         $positionsCount = Position::count();
         $applicantsCount = User::where('role', 'student')->count();
-        $interviewsCount = Application::where('status', 'interview')->count();
+        $interviewsCount = Interview::where('status', 'scheduled')->count();
         $internsCount = Application::where('status', 'active')->count();
 
         $recentApplicants = Application::with(['user', 'position'])

@@ -1,0 +1,89 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use App\Models\Application;
+use App\Models\User;
+use App\Models\Document;
+use App\Models\Journal;
+use App\Models\Position;
+use App\Models\FinalReport;
+use App\Models\Evaluation;
+use App\Models\Certificate;
+
+use Illuminate\Http\Request;
+
+class AdminInternController extends Controller
+{
+    // ✅ Menampilkan semua applicant
+public function index()
+{
+    $interns = User::whereHas('applications', function ($q) {
+        $q->where('status', 'active');
+    })->with('applications.position')->get();
+
+    $completedInterns = User::whereHas('applications', function ($q) {
+        $q->where('status', 'completed');
+    })->with('applications.position')->get();
+
+    $positions = Position::all();
+
+    return view('admin.intern', compact('interns', 'completedInterns', 'positions'));
+}
+
+
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'school_name' => 'nullable|string|max:255',
+            'major' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'position_id' => 'required|exists:positions,id',
+            'status' => 'required|in:active,completed,rejected,pending',
+        ]);
+
+        $intern = User::findOrFail($id);
+
+        // Update basic user data
+        $intern->update([
+            'name' => $request->name,
+            'school_name' => $request->school_name,
+            'major' => $request->major,
+            'phone' => $request->phone,
+        ]);
+
+        // Update the related application
+        $application = $intern->applications()->where('status', '!=', null)->first();
+        if ($application) {
+            $application->update([
+                'position_id' => $request->position_id,
+                'status' => $request->status,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Intern data updated successfully!');
+    }
+
+    public function destroy($id)
+{
+    $intern = User::findOrFail($id);
+
+    // Hapus semua relasi terkait bila diperlukan
+    // (agar tidak ada foreign key constraint error)
+    $intern->applications()->delete();
+    $intern->journals()->delete();
+    $intern->evaluations()->delete();
+    $intern->certificate()?->delete();
+    $intern->finalReport()?->delete();
+
+    // Terakhir, hapus user
+    $intern->delete();
+
+    return redirect()->back()->with('success', 'Intern has been deleted successfully.');
+}
+
+
+}

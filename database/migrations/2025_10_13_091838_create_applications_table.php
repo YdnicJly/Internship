@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string('whatsapp_number')->nullable();
             $table->string('active_email')->nullable();
             $table->enum('status', [
-                'submitted', 'under_review', 'pretest', 'interview',
+                'submitted', 'under_review', 'interview',
                 'accepted', 'rejected', 'active', 'completed'
             ])->default('submitted');
 

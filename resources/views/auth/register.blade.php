@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="{{ asset('images/logo_crop.png') }}">
   <title>Register - Sistem Magang Diskominfo</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -45,7 +46,7 @@
             <select name="education_level" class="form-select" required>
               <option value="">-- Pilih --</option>
               <option value="SMK">SMK</option>
-              <option value="Mahasiswa">Mahasiswa</option>
+              <option value="Universitas">Mahasiswa</option>
             </select>
           </div>
 

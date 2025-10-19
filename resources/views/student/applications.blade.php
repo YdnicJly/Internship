@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="{{ asset('images/logo_crop.png') }}">
   <title>Internship Openings - Diskominfo Internship</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -61,20 +62,20 @@
   <div class="sidebar p-3">
     <div>
       <h5 class="fw-bold mb-4 d-flex align-items-center">
-        <i class="bi bi-person-workspace me-2"></i> Student Portal
+        <i class="bi bi-person-workspace me-2"></i> SIMMAGANG
       </h5>
       <ul class="nav flex-column gap-1">
-        <li><a href="{{ route('student.dashboard') }}" class="nav-link"><i class="bi bi-briefcase me-2"></i>
-            Dashboard</a></li>
+        <li><a href="{{ route('student.dashboard') }}" class="nav-link "><i class="bi bi-briefcase me-2"></i>
+            Beranda</a></li>
         <li><a href="{{ route('student.applications') }}" class="nav-link active"><i
-              class="bi bi-clipboard-check me-2"></i> My
-            Applications</a></li>
-        <li><a href="{{ route('student.journal') }}" class="nav-link"><i class="bi bi-journal-text me-2"></i> My
-            Journal</a></li>
-        <li><a href="{{ route('student.evaluation') }}" class="nav-link"><i class="bi bi-award me-2"></i> Evaluation</a>
-        </li>
-        <li><a href="{{ route('profile') }}" class="nav-link"><i class="bi bi-person-lines-fill me-2"></i> Profile</a>
-        </li>
+              class="bi bi-clipboard-check me-2"></i> Lamaran saya</a></li>
+        <li><a href="{{ route('student.journal') }}" class="nav-link"><i class="bi bi-journal-text me-2"></i>
+            Jurnal Magang
+          </a></li>
+        <li><a href="{{ route('student.evaluation') }}" class="nav-link"><i class="bi bi-award me-2"></i>
+            Evaluasi</a></li>
+        <li><a href="{{ route('profile') }}" class="nav-link"><i class="bi bi-person-lines-fill me-2"></i>
+            Profil</a></li>
       </ul>
     </div>
 
@@ -93,9 +94,9 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4 rounded shadow-sm">
       <div class="container-fluid">
-        <span class="navbar-brand mb-0 h5">{{ Auth::user()->name ?? 'Student' }}'s, Application</span>
+        <span class="navbar-brand mb-0 h5">{{ Auth::user()->name ?? 'Student' }}'s, Lamaran</span>
         <div class="d-flex align-items-center">
-          <span class="me-3 text-muted small">{{ Auth::user()->education_level ?? 'Internship Candidate' }}</span>
+          <span class="me-3 text-muted small">{{ Auth::user()->name ?? 'Internship Candidate' }}</span>
           <img
             src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'S') }}&background=0d6efd&color=fff"
             class="rounded-circle" width="40" height="40" alt="Student Avatar">
@@ -105,73 +106,144 @@
 
     <!-- Applications Table -->
     <div class="card p-4 mb-5">
-      <h5 class="mb-3"><i class="bi bi-list-check me-2 text-success"></i> Application Status</h5>
+      <h5 class="mb-3"><i class="bi bi-list-check me-2 text-success"></i>Status Lamaran</h5>
       <table class="table align-middle">
         <thead class="table-light">
           <tr>
-            <th>Position</th>
-            <th>Division</th>
+            <th>Tanggal Daftar</th>
+            <th>Posisi</th>
+            <th>Departemen</th>
             <th>Status</th>
-            <th>Applied On</th>
+            <th>Aksi</th>
           </tr>
         </thead>
         <tbody>
           @forelse ($applications as $app)
             <tr>
+              <td>{{ $app->created_at->format('Y-m-d') }}</td>
               <td>{{ $app->position->title }}</td>
               <td>{{ $app->position->department }}</td>
               <td>
                 @if ($app->status === 'accepted')
-                  <span class="badge bg-success">Accepted</span>
+                  <span class="badge bg-success">Diterima</span>
                 @elseif ($app->status === 'rejected')
-                  <span class="badge bg-danger">Rejected</span>
+                  <span class="badge bg-danger">Ditolak</span>
                 @else
-                  <span class="badge bg-warning text-dark">Under Review</span>
+                  <span class="badge bg-warning text-dark">Sedang Ditinjau</span>
                 @endif
               </td>
-              <td>{{ $app->created_at->format('Y-m-d') }}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                  data-bs-target="#detailModal{{ $app->id }}">
+                  <i class="bi bi-eye"></i> Detail
+                </button>
+              </td>
             </tr>
+
+            <!-- Detail Modal -->
+            <div class="modal fade" id="detailModal{{ $app->id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                  <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                      <i class="bi bi-file-text me-2"></i> Detail Lamaran
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                  </div>
+
+                  <div class="modal-body">
+                    <h6 class="fw-bold mb-3">{{ $app->position->title }} - {{ $app->position->department }}</h6>
+                    <p><strong>Status:</strong>
+                      @if ($app->status === 'accepted')
+                        <span class="badge bg-success">Diterima</span>
+                      @elseif ($app->status === 'rejected')
+                        <span class="badge bg-danger">Ditolak</span>
+                      @else
+                        <span class="badge bg-warning text-dark">Sedang Ditinjau</span>
+                      @endif
+                    </p>
+
+                    <hr>
+                    <h6 class="fw-bold">Informasi Lamaran</h6>
+                    <ul class="list-unstyled">
+                      <li><strong>Email Aktif:</strong> {{ $app->active_email }}</li>
+                      <li><strong>Nomor WhatsApp:</strong> {{ $app->whatsapp_number }}</li>
+                      <li><strong>Durasi Magang:</strong> {{ $app->duration }}</li>
+                      <li><strong>Motivasi:</strong> {{ $app->motivation }}</li>
+                    </ul>
+
+                    <hr>
+                    <h6 class="fw-bold mb-2"><i class="bi bi-file-earmark-text me-2 text-success"></i>Dokumen yang
+                      Diunggah
+                    </h6>
+                    @if ($app->documents->isEmpty())
+                      <p class="text-muted">TIdak Ada Dokumen yang Diunggah.</p>
+                    @else
+                      <ul class="list-group list-group-flush">
+                        @foreach ($app->documents as $doc)
+                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="text-capitalize">{{ $doc->type }}</span>
+                            <a href="{{ asset('storage/' . $doc->path) }}" target="_blank"
+                              class="btn btn-sm btn-outline-secondary">
+                              <i class="bi bi-box-arrow-up-right"></i> Buka
+                            </a>
+                          </li>
+                        @endforeach
+                      </ul>
+                    @endif
+                  </div>
+
+                  <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">
+                      <i class="bi bi-x-circle me-1"></i> Tutup
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           @empty
             <tr>
-              <td colspan="4" class="text-center text-muted py-4">No applications found.</td>
+              <td colspan="5" class="text-center text-muted py-4">No applications found.</td>
             </tr>
           @endforelse
         </tbody>
       </table>
+
     </div>
 
     <!-- Interview Schedule -->
     <div class="card p-4">
-      <h5 class="mb-3"><i class="bi bi-calendar-event me-2 text-primary"></i> Interview Schedule</h5>
+      <h5 class="mb-3"><i class="bi bi-calendar-event me-2 text-primary"></i> Jadwal Interview</h5>
       <table class="table align-middle">
         <thead class="table-light">
           <tr>
-            <th>Position</th>
-            <th>Date</th>
+            <th>Tanggal</th>
+            <th>Posisi</th>
             <th>Status</th>
-            <th>Result</th>
+            <th>Hasil</th>
           </tr>
         </thead>
         <tbody>
           @forelse ($interviews as $interview)
-            <tr>
-              <td>{{ $interview->application->position->title }}</td>
-              <td>
-                {{ $interview->scheduled_at ? \Carbon\Carbon::parse($interview->scheduled_at)->format('Y-m-d H:i') : '-' }}
-              </td>
-              <td>
-          <span class="badge bg-{{ 
-            $interview->status == 'scheduled' ? 'warning text-dark' :
+                  <tr>
+                    <td>
+                      {{ $interview->scheduled_at ? \Carbon\Carbon::parse($interview->scheduled_at)->format('Y-m-d H:i') : '-' }}
+                    </td>
+                    <td>{{ $interview->application->position->title }}</td>
+                    <td>
+                      <span class="badge bg-{{ 
+                                                                                    $interview->status == 'scheduled' ? 'warning text-dark' :
             ($interview->status == 'done' ? 'success' : 'secondary')
-          }}">
-            {{ ucfirst($interview->status) }}
-          </span>
-        </td>
-        <td>{{ $interview->result ?? '-' }}</td>
-            </tr>
+                                                                                  }}">
+                        {{ ucfirst($interview->status) }}
+                      </span>
+                    </td>
+                    <td>{{ $interview->result ?? '-' }}</td>
+                  </tr>
           @empty
             <tr>
-              <td colspan="4" class="text-center text-muted py-4">No upcoming interviews scheduled.</td>
+              <td colspan="4" class="text-center text-muted py-4">Tidak ada wawancara yang dijadwalkan dalam waktu dekat.
+              </td>
             </tr>
           @endforelse
         </tbody>

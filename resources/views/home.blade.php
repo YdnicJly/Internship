@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="{{ asset('images/logo_crop.png') }}">
     <title>Diskominfo Internship Portal</title>
 
     <!-- Bootstrap CSS -->
@@ -89,9 +90,8 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="#">
-                <img src="{{ asset('images/logo.png') }}" alt="Logo" width="100" height="40" class="me-2">
-                <span class="fw-bold text-primary">Diskominfo Internship</span>
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <span class="fw-bold text-primary">SIMMAGANG</span>
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 

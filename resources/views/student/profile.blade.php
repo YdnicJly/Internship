@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Profile - Diskominfo Internship</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/logo_crop.png') }}">
+  <title>Profil Saya - SIMMAGANG Diskominfo</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -69,29 +70,23 @@
   <div class="sidebar p-3">
     <div>
       <h5 class="fw-bold mb-4 d-flex align-items-center">
-        <i class="bi bi-person-workspace me-2"></i> Student Portal
+        <i class="bi bi-person-workspace me-2"></i> SIMMAGANG
       </h5>
       <ul class="nav flex-column gap-1">
-        <li><a href="{{ route('student.dashboard') }}" class="nav-link"><i class="bi bi-speedometer2 me-2"></i>
-            Dashboard</a></li>
-        <li><a href="{{ route('student.applications') }}" class="nav-link"><i class="bi bi-clipboard-check me-2"></i> My
-            Applications</a></li>
-        <li><a href="{{ route('student.journal') }}" class="nav-link"><i class="bi bi-journal-text me-2"></i> My
-            Journal</a></li>
-        <li><a href="{{ route('student.evaluation') }}" class="nav-link"><i class="bi bi-award me-2"></i> Evaluation</a>
-        </li>
-        <li><a href="{{ route('profile') }}" class="nav-link active"><i class="bi bi-person-lines-fill me-2"></i>
-            Profile</a></li>
+        <li><a href="{{ route('student.dashboard') }}" class="nav-link "><i class="bi bi-briefcase me-2"></i> Beranda</a></li>
+        <li><a href="{{ route('student.applications') }}" class="nav-link "><i class="bi bi-clipboard-check me-2"></i> Lamaran Saya</a></li>
+        <li><a href="{{ route('student.journal') }}" class="nav-link "><i class="bi bi-journal-text me-2"></i> Jurnal Magang</a></li>
+        <li><a href="{{ route('student.evaluation') }}" class="nav-link "><i class="bi bi-award me-2"></i> Evaluasi</a></li>
+        <li><a href="{{ route('profile') }}" class="nav-link active"><i class="bi bi-person-lines-fill me-2"></i> Profil</a></li>
       </ul>
     </div>
 
     <div>
       <hr class="text-white-50">
       <button type="button" class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#logoutModal">
-        <i class="bi bi-box-arrow-right me-1"></i> Logout
+        <i class="bi bi-box-arrow-right me-1"></i> Keluar
       </button>
     </div>
-
   </div>
 
   <!-- Main Content -->
@@ -99,22 +94,22 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4 rounded shadow-sm">
       <div class="container-fluid">
-        <span class="navbar-brand mb-0 h5">My Profile</span>
+        <span class="navbar-brand mb-0 h5">Profil Saya</span>
         <div class="d-flex align-items-center">
-          <span class="me-3 text-muted small">{{ Auth::user()->education_level ?? 'Internship Student' }}</span>
+          <span class="me-3 text-muted small">{{ Auth::user()->education_level ?? 'Mahasiswa Magang' }}</span>
           <img
             src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'S') }}&background=0d6efd&color=fff"
-            class="rounded-circle" width="40" height="40" alt="Student Avatar">
+            class="rounded-circle" width="40" height="40" alt="Foto Profil">
         </div>
       </div>
     </nav>
 
-    <!-- Profile Info -->
-    <div class="card p-4">
+    <!-- Profil -->
+    <div class="card p-4 mb-4">
       <div class="d-flex align-items-center mb-4">
         <img
           src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=0d6efd&color=fff' }}"
-          class="profile-avatar me-3" alt="Profile Photo">
+          class="profile-avatar me-3" alt="Foto Profil">
         <div>
           <h5 class="mb-0">{{ Auth::user()->name }}</h5>
           <small class="text-muted">{{ Auth::user()->email }}</small>
@@ -122,69 +117,119 @@
       </div>
 
       <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+  @csrf
+  @method('PUT')
+
+  <div class="row g-3">
+    <!-- Nama Lengkap -->
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Nama Lengkap</label>
+      <input type="text" name="name" class="form-control"
+        value="{{ old('name', Auth::user()->name) }}" required>
+    </div>
+
+    <!-- Email -->
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Email</label>
+      <input type="email" name="email" class="form-control"
+        value="{{ old('email', Auth::user()->email) }}" required>
+    </div>
+
+    <!-- Nama Sekolah / Universitas -->
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Asal Sekolah / Universitas</label>
+      <input type="text" name="school_name" class="form-control"
+        value="{{ old('school_name', Auth::user()->school_name) }}" required>
+    </div>
+
+    <!-- Jurusan -->
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Jurusan / Program Studi</label>
+      <input type="text" name="major" class="form-control"
+        value="{{ old('major', Auth::user()->major) }}" required>
+    </div>
+
+    <!-- Jenjang Pendidikan -->
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Jenjang Pendidikan</label>
+      <select name="education_level" class="form-select" required>
+        <option value="SMA/SMK" {{ Auth::user()->education_level == 'SMA/SMK' ? 'selected' : '' }}>SMA / SMK</option>
+        <option value="Diploma" {{ Auth::user()->education_level == 'Diploma' ? 'selected' : '' }}>Diploma</option>
+        <option value="Sarjana" {{ Auth::user()->education_level == 'Sarjana' ? 'selected' : '' }}>Sarjana (S1)</option>
+        <option value="Lainnya" {{ Auth::user()->education_level == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+      </select>
+    </div>
+
+    <!-- Nomor Telepon -->
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Nomor Telepon</label>
+      <input type="text" name="phone" class="form-control"
+        value="{{ old('phone', Auth::user()->phone) }}">
+    </div>
+
+    <!-- Alamat -->
+    <div class="col-12">
+      <label class="form-label fw-semibold">Alamat Lengkap</label>
+      <textarea name="address" class="form-control" rows="2"
+        placeholder="Masukkan alamat lengkap Anda">{{ old('address', Auth::user()->address) }}</textarea>
+    </div>
+
+    <!-- Foto Profil -->
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Foto Profil</label>
+      <input type="file" name="profile_photo" accept="image/*" class="form-control">
+      <small class="text-muted">Opsional - JPG/PNG maks. 2MB</small>
+    </div>
+
+    <!-- Tombol Simpan -->
+    <div class="col-12 text-end mt-3">
+      <button type="submit" class="btn btn-primary px-4">
+        <i class="bi bi-save me-1"></i> Simpan Perubahan
+      </button>
+    </div>
+  </div>
+</form>
+
+    </div>
+
+    <!-- Ganti Kata Sandi -->
+    <div class="card p-4">
+      <h5 class="mb-3"><i class="bi bi-lock-fill me-2 text-primary"></i> Ganti Kata Sandi</h5>
+      <form action="{{ route('profile.changePassword') }}" method="POST">
         @csrf
         @method('PUT')
-
         <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Full Name</label>
-            <input type="text" name="name" class="form-control" value="{{ old('name', Auth::user()->name) }}" required>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Kata Sandi Lama</label>
+            <input type="password" name="current_password" class="form-control" required>
           </div>
-
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Email</label>
-            <input type="email" name="email" class="form-control" value="{{ old('email', Auth::user()->email) }}"
-              required>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Kata Sandi Baru</label>
+            <input type="password" name="new_password" class="form-control" required>
           </div>
-
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">School / University</label>
-            <input type="text" name="school" class="form-control" value="{{ old('school', Auth::user()->school) }}"
-              required>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Konfirmasi Kata Sandi Baru</label>
+            <input type="password" name="new_password_confirmation" class="form-control" required>
           </div>
-
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Education Level</label>
-            <select name="education_level" class="form-select" required>
-              <option value="SMA/SMK" {{ Auth::user()->education_level == 'SMA/SMK' ? 'selected' : '' }}>SMA / SMK
-              </option>
-              <option value="University" {{ Auth::user()->education_level == 'University' ? 'selected' : '' }}>University
-              </option>
-              <option value="Other" {{ Auth::user()->education_level == 'Other' ? 'selected' : '' }}>Other</option>
-            </select>
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Phone</label>
-            <input type="text" name="phone" class="form-control" value="{{ old('phone', Auth::user()->phone) }}">
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Profile Photo</label>
-            <input type="file" name="photo" accept="image/*" class="form-control">
-            <small class="text-muted">Optional - JPG/PNG up to 2MB</small>
-          </div>
-
           <div class="col-12 text-end mt-3">
-            <button type="submit" class="btn btn-primary px-4">
-              <i class="bi bi-save me-1"></i> Save Changes
+            <button type="submit" class="btn btn-success px-4">
+              <i class="bi bi-key-fill me-1"></i> Ubah Kata Sandi
             </button>
           </div>
         </div>
       </form>
     </div>
   </div>
-  <!-- Logout Confirmation Modal -->
+
+  <!-- Modal Logout -->
   <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow">
         <div class="modal-header bg-danger text-white">
           <h5 class="modal-title" id="logoutModalLabel"><i class="bi bi-box-arrow-right me-2"></i>Konfirmasi Logout</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
         </div>
-        <div class="modal-body">
-          Apakah Anda yakin ingin keluar dari akun ini?
-        </div>
+        <div class="modal-body">Apakah Anda yakin ingin keluar dari akun ini?</div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
             <i class="bi bi-x-circle me-1"></i> Batal
@@ -201,7 +246,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 
 </html>

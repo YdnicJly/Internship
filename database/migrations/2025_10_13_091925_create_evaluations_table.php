@@ -9,8 +9,17 @@ return new class extends Migration {
         Schema::create('evaluations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->integer('score')->nullable();
-            $table->text('feedback')->nullable();
+
+            // Nilai per kriteria (0–100)
+            $table->integer('discipline')->nullable()->comment('Kedisiplinan');
+            $table->integer('teamwork')->nullable()->comment('Kerja sama tim');
+            $table->integer('communication')->nullable()->comment('Kemampuan komunikasi');
+            $table->integer('skill')->nullable()->comment('Kompetensi keahlian');
+            $table->integer('responsibility')->nullable()->comment('Tanggung jawab');
+
+            // Catatan evaluator
+            $table->text('notes')->nullable()->comment('Catatan tambahan dari pembimbing');
+
             $table->timestamps();
         });
     }
@@ -19,3 +28,4 @@ return new class extends Migration {
         Schema::dropIfExists('evaluations');
     }
 };
+

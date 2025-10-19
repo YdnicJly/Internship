@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Journal - Diskominfo Internship</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/logo_crop.png') }}">
+  <title>Jurnal Saya - SIMMAGANG Diskominfo</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -61,83 +62,82 @@
   <div class="sidebar p-3">
     <div>
       <h5 class="fw-bold mb-4 d-flex align-items-center">
-        <i class="bi bi-person-workspace me-2"></i> Student Portal
+        <i class="bi bi-person-workspace me-2"></i> SIMMAGANG
       </h5>
       <ul class="nav flex-column gap-1">
-        <li><a href="{{ route('student.dashboard') }}" class="nav-link"><i class="bi bi-speedometer2 me-2"></i>
-            Dashboard</a></li>
-        <li><a href="{{ route('student.applications') }}" class="nav-link"><i class="bi bi-clipboard-check me-2"></i> My
-            Applications</a></li>
-        <li><a href="{{ route('student.journal') }}" class="nav-link active"><i class="bi bi-journal-text me-2"></i> My
-            Journal</a></li>
-        <li><a href="{{ route('student.evaluation') }}" class="nav-link"><i class="bi bi-award me-2"></i> Evaluation</a>
-        </li>
-        <li><a href="{{ route('profile') }}" class="nav-link"><i class="bi bi-person-lines-fill me-2"></i> Profile</a>
-        </li>
+        <li><a href="{{ route('student.dashboard') }}" class="nav-link "><i class="bi bi-briefcase me-2"></i>
+            Beranda</a></li>
+        <li><a href="{{ route('student.applications') }}" class="nav-link "><i class="bi bi-clipboard-check me-2"></i>
+            Lamaran Saya</a></li>
+        <li><a href="{{ route('student.journal') }}" class="nav-link active"><i class="bi bi-journal-text me-2"></i>
+            Jurnal Magang</a></li>
+        <li><a href="{{ route('student.evaluation') }}" class="nav-link"><i class="bi bi-award me-2"></i>
+            Evaluasi</a></li>
+        <li><a href="{{ route('profile') }}" class="nav-link"><i class="bi bi-person-lines-fill me-2"></i>
+            Profil</a></li>
       </ul>
     </div>
 
     <div>
       <hr class="text-white-50">
       <button type="button" class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#logoutModal">
-        <i class="bi bi-box-arrow-right me-1"></i> Logout
+        <i class="bi bi-box-arrow-right me-1"></i> Keluar
       </button>
     </div>
-
   </div>
 
-  <!-- Main Content -->
+  <!-- Konten Utama -->
   <div class="content">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4 rounded shadow-sm">
       <div class="container-fluid">
-        <span class="navbar-brand mb-0 h5">My Journal</span>
+        <span class="navbar-brand mb-0 h5">Jurnal Saya</span>
         <div class="d-flex align-items-center">
-          <span class="me-3 text-muted small">{{ Auth::user()->education_level ?? 'Internship Student' }}</span>
+          <span class="me-3 text-muted small">{{ Auth::user()->name ?? 'Mahasiswa Magang' }}</span>
           <img
             src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'S') }}&background=0d6efd&color=fff"
-            class="rounded-circle" width="40" height="40" alt="Student Avatar">
+            class="rounded-circle" width="40" height="40" alt="Avatar Mahasiswa">
         </div>
       </div>
     </nav>
 
-    <!-- Add Journal Form -->
+    <!-- Form Tambah Jurnal -->
     <div class="card p-4 mb-4">
-      <h5 class="mb-3"><i class="bi bi-pencil-square me-2 text-primary"></i> Add New Journal Entry</h5>
+      <h5 class="mb-3"><i class="bi bi-pencil-square me-2 text-primary"></i> Tambah Entri Jurnal Baru</h5>
       <form action="{{ route('student.journal.store') }}" method="POST">
         @csrf
         <div class="row g-3">
           <div class="col-md-3">
-            <label class="form-label fw-semibold">Date</label>
+            <label class="form-label fw-semibold">Tanggal</label>
             <input type="date" name="date" class="form-control" value="{{ date('Y-m-d') }}" required>
           </div>
           <div class="col-md-9">
-            <label class="form-label fw-semibold">Activity</label>
-            <input type="text" name="activity" class="form-control" placeholder="e.g., Implemented dashboard UI"
+            <label class="form-label fw-semibold">Kegiatan</label>
+            <input type="text" name="activity" class="form-control" placeholder="Contoh: Membuat tampilan dashboard UI"
               required>
           </div>
           <div class="col-12">
-            <label class="form-label fw-semibold">Description</label>
+            <label class="form-label fw-semibold">Deskripsi</label>
             <textarea name="description" rows="3" class="form-control"
-              placeholder="Describe what you worked on today..." required></textarea>
+              placeholder="Jelaskan apa yang Anda kerjakan hari ini..." required></textarea>
           </div>
           <div class="col-12 text-end">
-            <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> Add Journal</button>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> Tambah Jurnal</button>
           </div>
         </div>
       </form>
     </div>
 
-    <!-- Journal Entries Table -->
+    <!-- Tabel Jurnal -->
     <div class="card p-4">
-      <h5 class="mb-3"><i class="bi bi-journal-text me-2 text-success"></i>My Journal Entries</h5>
+      <h5 class="mb-3"><i class="bi bi-journal-text me-2 text-success"></i>Daftar Jurnal Saya</h5>
       <table class="table align-middle">
         <thead class="table-light">
           <tr>
-            <th width="10%">Date</th>
-            <th width="20%">Activity</th>
-            <th>Description</th>
-            <th width="10%" class="text-center">Action</th>
+            <th width="10%">Tanggal</th>
+            <th width="20%">Kegiatan</th>
+            <th>Deskripsi</th>
+            <th width="10%" class="text-center">Aksi</th>
           </tr>
         </thead>
         <tbody>
@@ -148,7 +148,7 @@
               <td>{{ $journal->description }}</td>
               <td class="text-center">
                 <form action="{{ route('student.journal.destroy', $journal->id) }}" method="POST"
-                  onsubmit="return confirm('Delete this entry?')">
+                  onsubmit="return confirm('Hapus entri ini?')">
                   @csrf
                   @method('DELETE')
                   <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
@@ -159,7 +159,7 @@
             <tr>
               <td colspan="4" class="text-center text-muted py-4">
                 <i class="bi bi-emoji-neutral display-6 d-block mb-2"></i>
-                No journal entries yet.
+                Belum ada entri jurnal.
               </td>
             </tr>
           @endforelse
@@ -167,13 +167,14 @@
       </table>
     </div>
   </div>
-  <!-- Logout Confirmation Modal -->
+
+  <!-- Modal Konfirmasi Logout -->
   <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow">
         <div class="modal-header bg-danger text-white">
-          <h5 class="modal-title" id="logoutModalLabel"><i class="bi bi-box-arrow-right me-2"></i>Konfirmasi Logout</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title" id="logoutModalLabel"><i class="bi bi-box-arrow-right me-2"></i>Konfirmasi Keluar</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
         </div>
         <div class="modal-body">
           Apakah Anda yakin ingin keluar dari akun ini?

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="{{ asset('images/logo_crop.png') }}">
   <title>Login - Sistem Magang Diskominfo</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -10,7 +11,7 @@
 
   <div class="container d-flex align-items-center justify-content-center vh-100">
     <div class="card shadow-lg p-4" style="width: 400px;">
-      <h4 class="text-center mb-4">Login Sistem Magang</h4>
+      <h4 class="text-center mb-4">SIMMAGANG</h4>
 
       @if (session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>

@@ -4,42 +4,41 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
+use App\Models\User;
 
 class UsersSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('users')->insert([
-            [
-                'name' => 'Admin Diskominfo',
-                'email' => 'admin@diskominfo.test',
-                'password' => Hash::make('admin123'),
-                'role' => 'admin',
-                'school_name' => null,
-                'major' => null,
-                'education_level' => null,
-                'phone' => null,
-                'address' => null,
-                'profile_photo' => null,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'name' => 'Student Tester',
-                'email' => 'student@diskominfo.test',
-                'password' => Hash::make('student123'),
-                'role' => 'student',
-                'school_name' => 'Universitas Negeri Diskominfo',
-                'major' => 'Teknik Informatika',
-                'education_level' => 'Universitas',
-                'phone' => '081234567890',
-                'address' => 'Jl. Pemuda No. 12, Kota Diskominfo',
-                'profile_photo' => null,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
+        // Admin
+        User::create([
+            'name' => 'Administrator Sistem',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+            'phone' => '081234567890',
+            'address' => 'Diskominfo Kabupaten Contoh',
+            'profile_photo' => null,
         ]);
+
+        // Belasan siswa (SMK & Universitas)
+        $schoolNames = ['SMK Negeri 1 Bandung', 'SMK Telkom Malang', 'Universitas Brawijaya', 'Universitas Diponegoro', 'SMK Negeri 2 Jakarta'];
+        $majors = ['Teknik Informatika', 'Sistem Informasi', 'Desain Grafis', 'Manajemen', 'Akuntansi'];
+
+        for ($i = 1; $i <= 18; $i++) {
+            $isUniv = rand(0, 1);
+            User::create([
+                'name' => fake('id_ID')->name(),
+                'email' => 'student' . $i . '@example.com',
+                'password' => Hash::make('password'),
+                'role' => 'student',
+                'school_name' => $schoolNames[array_rand($schoolNames)],
+                'major' => $majors[array_rand($majors)],
+                'education_level' => $isUniv ? 'Universitas' : 'SMK',
+                'phone' => '08' . rand(1000000000, 9999999999),
+                'address' => fake('id_ID')->address(),
+                'profile_photo' => null,
+            ]);
+        }
     }
 }

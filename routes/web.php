@@ -1,12 +1,13 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\AdminCertificateController;
 use App\Http\Controllers\AdminEvaluationController;
 use App\Http\Controllers\AdminInterviewController;
 use App\Http\Controllers\AdminJournalController;
 use App\Http\Controllers\AdminPositionController;
 use App\Http\Controllers\AdminUserController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LowonganController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentController;
@@ -15,6 +16,8 @@ use App\Http\Controllers\AdminApplicantController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\StudentProfileController;
+use App\Http\Controllers\AdminInternController;
+use App\Http\Controllers\StudentApplicationController;
 
 
 Route::get('/', [LowonganController::class, 'index'])->name('landing');
@@ -30,7 +33,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/student/dashboard', [StudentController::class, 'index'])->name('student.dashboard');
-
+    Route::post('/student/applications', [StudentApplicationController::class, 'store'])
+        ->name('student.applications.store');
 
     Route::get('/student/applications', [StudentController::class, 'applications'])->name('student.applications');
 
@@ -48,6 +52,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
     Route::get('/studentprofile', [StudentProfileController::class, 'index'])->name('profile');
     Route::put('profile/update', [StudentProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/change-password', [StudentProfileController::class, 'changePassword'])->name('profile.changePassword');
 });
 
 
@@ -71,17 +76,27 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::put('/interviews/{id}', [AdminInterviewController::class, 'update'])->name('admin.interviews.update');
     Route::delete('/interviews/{id}', [AdminInterviewController::class, 'destroy'])->name('admin.interviews.destroy');
 
-    Route::get('/admin/journals', [AdminJournalController::class, 'index'])->name('admin.journals');
+
+    Route::get('/admin/intern', [AdminInternController::class, 'index'])->name('admin.intern');
+    Route::put('/admin/intern/{id}', [AdminInternController::class, 'update'])->name('admin.intern.update');
+    Route::delete('/admin/intern/{id}', [AdminInternController::class, 'destroy'])->name('admin.intern.destroy');
 
 
-    Route::get('/admin/evaluations', [AdminEvaluationController::class, 'index'])->name('admin.evaluations');
+    // Journal & Evaluation pages
+    Route::get('/admin/intern/{user}/journal', [AdminJournalController::class, 'show'])->name('admin.journals.show');
+    Route::get('/admin/intern/{user}/evaluation', [AdminEvaluationController::class, 'show'])->name('admin.evaluations.show');
 
-
-    Route::get('/admin/certificates', [AdminCertificateController::class, 'index'])->name('admin.certificates');
+    // Certificate management
+    Route::post('/admin/certificate', [AdminCertificateController::class, 'store'])->name('admin.certificate.store');
+    Route::put('/admin/certificate/{certificate}', [AdminCertificateController::class, 'update'])->name('admin.certificate.update');
+    Route::delete('/admin/certificate/{certificate}', [AdminCertificateController::class, 'destroy'])->name('admin.certificate.destroy');
 
 
     Route::get('/admin/user', [AdminUserController::class, 'index'])->name('admin.user');
-
+    Route::get('/users', [AdminUserController::class, 'index'])->name('admin.user');
+    Route::post('/users', [AdminUserController::class, 'store'])->name('admin.user.store');
+    Route::put('/users/{id}', [AdminUserController::class, 'update'])->name('admin.user.update');
+    Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('admin.user.destroy');
 
 
 

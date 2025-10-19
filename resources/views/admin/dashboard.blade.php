@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Admin Dashboard - Diskominfo Internship</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/logo_crop.png') }}">
+  <title>Dashboard Admin - SIMMAGANG Diskominfo</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -13,6 +15,7 @@
       font-family: "Inter", "Segoe UI", sans-serif;
       background-color: #f8f9fa;
     }
+
     .sidebar {
       width: 250px;
       height: 100vh;
@@ -23,25 +26,30 @@
       flex-direction: column;
       justify-content: space-between;
     }
+
     .sidebar .nav-link {
       color: #ffffffcc;
       font-weight: 500;
     }
+
     .sidebar .nav-link:hover,
     .sidebar .nav-link.active {
       color: #fff;
-      background-color: rgba(255,255,255,0.15);
+      background-color: rgba(255, 255, 255, 0.15);
       border-radius: 6px;
     }
+
     .content {
       margin-left: 250px;
       padding: 2rem;
     }
+
     .card {
       border: none;
       border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     }
+
     .navbar {
       background: white;
       border-bottom: 1px solid #dee2e6;
@@ -54,24 +62,31 @@
   <div class="sidebar p-3">
     <div>
       <h5 class="fw-bold mb-4 d-flex align-items-center">
-        <i class="bi bi-building me-2"></i> Diskominfo Admin
+        <i class="bi bi-building me-2"></i>SIMMAGANG
       </h5>
       <ul class="nav flex-column gap-1">
-        <li><a href="{{ route('admin.dashboard') }}" class="nav-link active"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
-        <li><a href="{{ route('admin.positions') }}" class="nav-link"><i class="bi bi-briefcase me-2"></i> Positions</a></li>
-        <li><a href="{{ route('admin.applicants') }}" class="nav-link "><i class="bi bi-people me-2"></i> Applicants</a></li>
-        <li><a href="{{ route('admin.interviews') }}" class="nav-link"><i class="bi bi-calendar-event me-2"></i> Interviews</a></li>
-        <li><a href="{{ route('admin.journals') }}" class="nav-link"><i class="bi bi-journal-check me-2"></i> Journals</a></li>
-        <li><a href="{{ route('admin.evaluations') }}" class="nav-link"><i class="bi bi-file-earmark-bar-graph me-2"></i> Evaluations</a></li>
-        <li><a href="{{ route('admin.certificates') }}" class="nav-link"><i class="bi bi-award me-2"></i> Certificates</a></li>
-        <li><a href="{{ route('admin.user') }}" class="nav-link"><i class="bi bi-person-gear me-2"></i> User Management</a></li>
+        <li><a href="{{ route('admin.dashboard') }}" class="nav-link active"><i class="bi bi-speedometer2 me-2"></i>
+            Beranda</a></li>
+        <li><a href="{{ route('admin.positions') }}" class="nav-link"><i class="bi bi-briefcase me-2"></i> Lowongan
+            Magang
+          </a></li>
+        <li><a href="{{ route('admin.applicants') }}" class="nav-link"><i class="bi bi-people me-2"></i> Data Pendaftar
+          </a></li>
+        <li><a href="{{ route('admin.interviews') }}" class="nav-link "><i class="bi bi-calendar-event me-2"></i>
+            Jadwal Wawancara
+          </a></li>
+        <li><a href="{{ route('admin.intern') }}" class="nav-link "><i class="bi bi-journal-check me-2"></i>
+            Data Pemagang
+          </a></li>
+        <li><a href="{{ route('admin.user') }}" class="nav-link "><i
+              class="bi bi-person-gear me-2"></i>Manajemen Pengguna</a></li>
       </ul>
     </div>
 
     <div>
       <hr class="text-white-50">
       <button type="button" class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#logoutModal">
-        <i class="bi bi-box-arrow-right me-1"></i> Logout
+        <i class="bi bi-box-arrow-right me-1"></i> Keluar
       </button>
     </div>
   </div>
@@ -81,16 +96,17 @@
     <!-- Top Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4 rounded shadow-sm">
       <div class="container-fluid">
-        <span class="navbar-brand mb-0 h5">Dashboard Overview</span>
+        <span class="navbar-brand mb-0 h5">Beranda Admin</span>
         <div class="d-flex align-items-center">
-          <span class="me-3 text-muted small">Welcome, {{ Auth::user()->name ?? 'Admin' }}</span>
-          <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'A') }}&background=0d6efd&color=fff" 
-               class="rounded-circle" width="40" height="40" alt="Admin Avatar">
+          <span class="me-3 text-muted small">Selamat datang, {{ Auth::user()->name ?? 'Admin' }}</span>
+          <img
+            src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'A') }}&background=0d6efd&color=fff"
+            class="rounded-circle" width="40" height="40" alt="Foto Admin">
         </div>
       </div>
     </nav>
 
-    <!-- Dashboard Stats -->
+    <!-- Statistik Dashboard -->
     <div class="row g-4">
       <div class="col-md-3">
         <div class="card p-3">
@@ -99,7 +115,7 @@
               <i class="bi bi-briefcase fs-4"></i>
             </div>
             <div>
-              <h6 class="mb-0">Positions</h6>
+              <h6 class="mb-0">Posisi Magang</h6>
               <h4 class="fw-bold mb-0">{{ $positionsCount }}</h4>
             </div>
           </div>
@@ -113,7 +129,7 @@
               <i class="bi bi-people fs-4"></i>
             </div>
             <div>
-              <h6 class="mb-0">Applicants</h6>
+              <h6 class="mb-0">Total Pendaftar</h6>
               <h4 class="fw-bold mb-0">{{ $applicantsCount }}</h4>
             </div>
           </div>
@@ -127,7 +143,7 @@
               <i class="bi bi-calendar-event fs-4"></i>
             </div>
             <div>
-              <h6 class="mb-0">Interviews</h6>
+              <h6 class="mb-0">Jadwal Wawancara</h6>
               <h4 class="fw-bold mb-0">{{ $interviewsCount }}</h4>
             </div>
           </div>
@@ -141,7 +157,7 @@
               <i class="bi bi-award fs-4"></i>
             </div>
             <div>
-              <h6 class="mb-0">Interns</h6>
+              <h6 class="mb-0">Peserta Aktif</h6>
               <h4 class="fw-bold mb-0">{{ $internsCount }}</h4>
             </div>
           </div>
@@ -149,53 +165,57 @@
       </div>
     </div>
 
-    <!-- Recent Applicants -->
+    <!-- Pendaftar Terbaru -->
     <div class="card mt-5 p-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0"><i class="bi bi-people me-2 text-primary"></i>Recent Applicants</h5>
-        <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+        <h5 class="mb-0"><i class="bi bi-people me-2 text-primary"></i>Pendaftar Terbaru</h5>
+        <a href="{{ route('admin.applicants') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
       </div>
       <table class="table align-middle">
         <thead class="table-light">
           <tr>
-            <th>Name</th>
-            <th>School / University</th>
-            <th>Position</th>
+            <th>Nama</th>
+            <th>Asal Sekolah / Universitas</th>
+            <th>Posisi Magang</th>
             <th>Status</th>
-            <th>Applied Date</th>
+            <th>Tanggal Daftar</th>
           </tr>
         </thead>
         <tbody>
           @forelse($recentApplicants as $application)
-          <tr>
-            <td>{{ $application->user->name }}</td>
-            <td>{{ $application->user->school ?? '-' }}</td>
-            <td>{{ $application->position->title ?? '-' }}</td>
-            <td>
-              @if($application->status == 'submitted')
-                <span class="badge bg-secondary">Submitted</span>
-              @elseif($application->status == 'under_review')
-                <span class="badge bg-warning text-dark">Reviewing</span>
-              @endif
-            </td>
-            <td>{{ $application->created_at->format('Y-m-d') }}</td>
-          </tr>
+            <tr>
+              <td>{{ $application->user->name }}</td>
+              <td>{{ $application->user->school_name ?? '-' }}</td>
+              <td>{{ $application->position->title ?? '-' }}</td>
+              <td>
+                @if($application->status == 'submitted')
+                  <span class="badge bg-secondary">Dikirim</span>
+                @elseif($application->status == 'under_review')
+                  <span class="badge bg-warning text-dark">Sedang Ditinjau</span>
+                @elseif($application->status == 'active')
+                  <span class="badge bg-success">Aktif</span>
+                @else
+                  <span class="badge bg-light text-muted">Tidak Diketahui</span>
+                @endif
+              </td>
+              <td>{{ $application->created_at->format('d M Y') }}</td>
+            </tr>
           @empty
-          <tr>
-            <td colspan="5" class="text-center text-muted">No new applicants.</td>
-          </tr>
+            <tr>
+              <td colspan="5" class="text-center text-muted">Belum ada pendaftar baru.</td>
+            </tr>
           @endforelse
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Logout Confirmation Modal -->
+  <!-- Modal Logout -->
   <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow">
         <div class="modal-header bg-danger text-white">
-          <h5 class="modal-title" id="logoutModalLabel"><i class="bi bi-box-arrow-right me-2"></i>Konfirmasi Logout</h5>
+          <h5 class="modal-title" id="logoutModalLabel"><i class="bi bi-box-arrow-right me-2"></i>Konfirmasi Keluar</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -218,4 +238,5 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
