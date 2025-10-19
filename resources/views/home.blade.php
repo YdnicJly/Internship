@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/png" href="{{ asset('images/logo_crop.png') }}">
-    <title>Diskominfo Internship Portal</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/logo.jpg') }}">
+    <title>SIMMAGANG</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -102,12 +102,6 @@
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto me-3">
-                    <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#announcements">Announcements</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                 </ul>
 
                 <a href="{{ route('login') }}" class="btn btn-primary px-3">
@@ -124,7 +118,7 @@
                 <div class="col-md-6">
                     <h1 class="display-5 mb-3">
                         Manage Your Internship <br>
-                        with <span class="text-primary">Diskominfo</span>
+                        with <span class="text-primary">SIMMAGANG</span>
                     </h1>
                     <p class="lead mb-4">
                         Streamline your internship journey — from application to completion, all in one integrated system.
@@ -152,8 +146,8 @@
     <!-- Footer -->
     <footer class="text-center">
         <div class="container">
-            <p class="mb-1">&copy; {{ date('Y') }} Diskominfo Internship System. All rights reserved.</p>
-            <small>Developed by <a href="#">Diskominfo IT Team</a></small>
+            <p class="mb-1">&copy; {{ date('Y') }} SIMMAGANG Internship System. All rights reserved.</p>
+            <small>Developed by <a href="#">SIMMAGANG IT Team</a></small>
         </div>
     </footer>
 

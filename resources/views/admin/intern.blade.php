@@ -4,8 +4,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Data Pemagang - Diskominfo</title>
-  <link rel="icon" type="image/png" href="{{ asset('images/logo_crop.png') }}">
+  <title>SIMMAGANG</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/logo.jpg') }}">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -71,12 +71,18 @@
         <i class="bi bi-building me-2"></i>SIMMAGANG
       </h5>
       <ul class="nav flex-column gap-1">
-        <li><a href="{{ route('admin.dashboard') }}" class="nav-link"><i class="bi bi-speedometer2 me-2"></i> Beranda</a></li>
-        <li><a href="{{ route('admin.positions') }}" class="nav-link"><i class="bi bi-briefcase me-2"></i> Lowongan Magang</a></li>
-        <li><a href="{{ route('admin.applicants') }}" class="nav-link"><i class="bi bi-people me-2"></i> Data Pendaftar</a></li>
-        <li><a href="{{ route('admin.interviews') }}" class="nav-link"><i class="bi bi-calendar-event me-2"></i> Jadwal Wawancara</a></li>
-        <li><a href="{{ route('admin.intern') }}" class="nav-link active"><i class="bi bi-journal-check me-2"></i> Data Pemagang</a></li>
-        <li><a href="{{ route('admin.user') }}" class="nav-link"><i class="bi bi-person-gear me-2"></i> Manajemen Pengguna</a></li>
+        <li><a href="{{ route('admin.dashboard') }}" class="nav-link"><i class="bi bi-speedometer2 me-2"></i>
+            Beranda</a></li>
+        <li><a href="{{ route('admin.positions') }}" class="nav-link"><i class="bi bi-briefcase me-2"></i> Lowongan
+            Magang</a></li>
+        <li><a href="{{ route('admin.applicants') }}" class="nav-link"><i class="bi bi-people me-2"></i> Data
+            Pendaftar</a></li>
+        <li><a href="{{ route('admin.interviews') }}" class="nav-link"><i class="bi bi-calendar-event me-2"></i> Jadwal
+            Wawancara</a></li>
+        <li><a href="{{ route('admin.intern') }}" class="nav-link active"><i class="bi bi-journal-check me-2"></i> Data
+            Pemagang</a></li>
+        <li><a href="{{ route('admin.user') }}" class="nav-link"><i class="bi bi-person-gear me-2"></i> Manajemen
+            Pengguna</a></li>
       </ul>
     </div>
 
@@ -95,7 +101,8 @@
         <span class="navbar-brand mb-0 h5">Manajemen Data Pemagang</span>
         <div class="d-flex align-items-center">
           <span class="me-3 text-muted small">Halo, {{ Auth::user()->name ?? 'Admin' }}</span>
-          <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'A') }}&background=0d6efd&color=fff"
+          <img
+            src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'A') }}&background=0d6efd&color=fff"
             class="rounded-circle" width="40" height="40" alt="Admin Avatar">
         </div>
       </div>
@@ -130,12 +137,16 @@
               <td>{{ $application->position->title ?? '-' }}</td>
               <td>{{ $intern->phone ?? '-' }}</td>
               <td>
-                <span class="badge 
-                  @if($application->status == 'active') bg-success
-                  @elseif($application->status == 'completed') bg-secondary
-                  @elseif($application->status == 'rejected') bg-danger
-                  @else bg-warning text-dark @endif">
-                  {{ ucfirst($application->status) }}
+                @php
+                  $statusMap = [
+                    'active' => ['label' => 'Aktif', 'class' => 'success'],
+                  ];
+
+                  $status = $statusMap[$application->status] ?? ['label' => ucfirst($application->status), 'class' => 'secondary'];
+                @endphp
+
+                <span class="badge bg-{{ $status['class'] }}">
+                  {{ $status['label'] }}
                 </span>
               </td>
               <td class="text-end d-flex justify-content-end align-items-center gap-2">
@@ -144,25 +155,169 @@
                     Aksi
                   </button>
                   <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                    <li><a href="{{ route('admin.journals.show', $intern->id) }}" class="dropdown-item"><i class="bi bi-journal-text me-2 text-primary"></i> Jurnal</a></li>
-                    <li><a href="{{ route('admin.evaluations.show', $intern->id) }}" class="dropdown-item"><i class="bi bi-clipboard2-check me-2 text-success"></i> Evaluasi</a></li>
-                    <li><a href="#" class="dropdown-item text-warning" data-bs-toggle="modal" data-bs-target="#certificateModal{{ $intern->id }}"><i class="bi bi-file-earmark-pdf me-2"></i> Sertifikat</a></li>
+                    <a href="{{ route('admin.intern.journals', $intern->id) }}" class="dropdown-item">
+                      <i class="bi bi-journal-text me-2 text-primary"></i> Jurnal
+                    </a>
+                    <li><a href="#" class="dropdown-item text-success" data-bs-toggle="modal"
+                        data-bs-target="#evaluationModal{{ $intern->id }}"><i class="bi bi-clipboard2-check me-2"></i>
+                        Evaluasi</a></li>
+                    <li><a href="#" class="dropdown-item text-warning" data-bs-toggle="modal"
+                        data-bs-target="#certificateModal{{ $intern->id }}"><i class="bi bi-file-earmark-pdf me-2"></i>
+                        Sertifikat</a></li>
                   </ul>
                 </div>
 
-                <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editInternModal{{ $intern->id }}">
+                <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal"
+                  data-bs-target="#editInternModal{{ $intern->id }}">
                   <i class="bi bi-pencil"></i>
                 </button>
 
                 <form action="{{ route('admin.intern.destroy', $intern->id) }}" method="POST" class="d-inline">
                   @csrf
                   @method('DELETE')
-                  <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus data pemagang ini?')">
+                  <button type="submit" class="btn btn-sm btn-outline-danger"
+                    onclick="return confirm('Hapus data pemagang ini?')">
                     <i class="bi bi-trash"></i>
                   </button>
                 </form>
               </td>
             </tr>
+            <!-- Modal Evaluasi + Final Report -->
+<div class="modal fade" id="evaluationModal{{ $intern->id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><i class="bi bi-clipboard2-check me-2"></i>Evaluasi Pemagang</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <form action="{{ route('admin.intern.evaluation.store', $intern->id) }}" method="POST">
+        @csrf
+        <div class="modal-body">
+
+          {{-- 🔹 Form Penilaian --}}
+          <div class="row g-3 mb-4">
+            @foreach ([
+              'discipline' => 'Kedisiplinan',
+              'teamwork' => 'Kerja Sama Tim',
+              'communication' => 'Komunikasi',
+              'skill' => 'Keahlian',
+              'responsibility' => 'Tanggung Jawab'
+            ] as $key => $label)
+              <div class="col-md-6">
+                <label class="form-label">{{ $label }}</label>
+                <input type="number" name="{{ $key }}" class="form-control" min="0" max="100" required>
+              </div>
+            @endforeach
+
+            <div class="col-12">
+              <label class="form-label">Catatan</label>
+              <textarea name="notes" class="form-control" rows="3"></textarea>
+            </div>
+          </div>
+
+          <hr class="my-3">
+
+          {{-- 🔹 Bagian Laporan Akhir --}}
+          <h6 class="fw-bold mb-3 text-info"><i class="bi bi-journal-richtext me-2"></i>Laporan Akhir</h6>
+          @php
+            $finalReport = $intern->finalReport ?? null;
+          @endphp
+
+          @if ($finalReport && $finalReport->file_path)
+            <div class="ratio ratio-16x9 border rounded mb-3">
+              <iframe src="{{ asset('storage/' . $finalReport->file_path) }}" class="rounded"></iframe>
+            </div>
+            <a href="{{ asset('storage/' . $finalReport->file_path) }}" target="_blank"
+               class="btn btn-outline-info btn-sm">
+              <i class="bi bi-box-arrow-up-right me-1"></i> Buka Laporan di Tab Baru
+            </a>
+          @else
+            <p class="text-muted mb-0">Belum ada laporan akhir diunggah oleh pemagang ini.</p>
+          @endif
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan Evaluasi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+            <!-- Modal Sertifikat -->
+            <div class="modal fade" id="certificateModal{{ $intern->id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                  <div class="modal-header bg-warning">
+                    <h5 class="modal-title text-dark"><i class="bi bi-file-earmark-pdf me-2"></i>Upload Sertifikat</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <form action="{{ route('admin.intern.certificate.store', $intern->id) }}" method="POST"
+                    enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                      <label class="form-label">File Sertifikat (PDF)</label>
+                      <input type="file" name="certificate_file" class="form-control" accept="application/pdf" required>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                      <button type="submit" class="btn btn-warning text-dark">Upload</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- Modal Edit Status -->
+            <div class="modal fade" id="editInternModal{{ $intern->id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                  <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Status Pemagang</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                  </div>
+                  <form action="{{ route('admin.intern.update', $intern->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <label class="form-label">Nama</label>
+                        <input type="text" class="form-control" value="{{ $intern->name }}" readonly>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Sekolah</label>
+                        <input type="text" class="form-control" value="{{ $intern->school_name }}" readonly>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Jurusan</label>
+                        <input type="text" class="form-control" value="{{ $intern->major }}" readonly>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Status Magang</label>
+                        <select name="status" class="form-select" required>
+                          <option value="active" {{ $application->status == 'active' ? 'selected' : '' }}>Aktif</option>
+                          <option value="completed" {{ $application->status == 'completed' ? 'selected' : '' }}>Selesai
+                          </option>
+                        </select>
+                      </div>
+                      <input type="hidden" name="position_id" value="{{ $application->position_id }}">
+                      <input type="hidden" name="name" value="{{ $intern->name }}">
+                      <input type="hidden" name="school_name" value="{{ $intern->school_name }}">
+                      <input type="hidden" name="major" value="{{ $intern->major }}">
+                      <input type="hidden" name="phone" value="{{ $intern->phone }}">
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                      <button type="submit" class="btn btn-info text-white">Simpan</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
           @empty
             <tr>
               <td colspan="7" class="text-center text-muted py-4">Tidak ada data pemagang aktif.</td>
@@ -194,27 +349,129 @@
           @forelse($completedInterns as $intern)
             @php
               $application = $intern->applications->where('status', 'completed')->first();
+              $evaluation = $intern->evaluations?->last();
+              $certificate = $intern->certificate ?? null;
             @endphp
+
             <tr>
               <td>{{ $intern->name }}</td>
               <td>{{ $intern->school_name ?? '-' }}</td>
               <td>{{ $intern->major ?? '-' }}</td>
-              <td>{{ $application->position->title ?? '-' }}</td>
+              <td>{{ $application?->position?->title ?? '-' }}</td>
               <td>{{ $intern->phone ?? '-' }}</td>
-              <td><span class="badge bg-secondary">{{ ucfirst($application->status) }}</span></td>
+              <td><span class="badge bg-secondary">Selesai</span></td>
+
               <td class="text-end d-flex justify-content-end align-items-center gap-2">
-                <a href="{{ route('admin.journals.show', $intern->id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-journal-text"></i></a>
-                <a href="{{ route('admin.evaluations.show', $intern->id) }}" class="btn btn-sm btn-outline-success"><i class="bi bi-clipboard2-check"></i></a>
-                <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#certificateModal{{ $intern->id }}"><i class="bi bi-file-earmark-pdf"></i></button>
+                <!-- Jurnal -->
+                <a href="{{ route('admin.journals.show', $intern->id) }}" class="btn btn-sm btn-outline-primary"
+                  title="Lihat Jurnal">
+                  <i class="bi bi-journal-text"></i>
+                </a>
+
+                <!-- Evaluasi -->
+                <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal"
+                  data-bs-target="#evaluationModal{{ $intern->id }}" title="Lihat Evaluasi" {{ !$evaluation ? 'disabled' : '' }}>
+                  <i class="bi bi-clipboard2-check"></i>
+                </button>
+
+                <!-- Sertifikat -->
+                <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal"
+                  data-bs-target="#certificateModal{{ $intern->id }}" title="Lihat Sertifikat" {{ !$certificate ? 'disabled' : '' }}>
+                  <i class="bi bi-file-earmark-pdf"></i>
+                </button>
+
+                <!-- Hapus -->
                 <form action="{{ route('admin.intern.destroy', $intern->id) }}" method="POST" class="d-inline">
                   @csrf
                   @method('DELETE')
-                  <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus data pemagang ini?')">
+                  <button type="submit" class="btn btn-sm btn-outline-danger"
+                    onclick="return confirm('Hapus data pemagang ini?')" title="Hapus Data">
                     <i class="bi bi-trash"></i>
                   </button>
                 </form>
               </td>
             </tr>
+
+            <!-- Modal Evaluasi + Final Report -->
+            <div class="modal fade" id="evaluationModal{{ $intern->id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                  <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                      <i class="bi bi-clipboard2-check me-2"></i>Hasil Evaluasi & Laporan Akhir
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                  </div>
+
+                  <div class="modal-body">
+                    {{-- Bagian Evaluasi --}}
+                    <h6 class="fw-bold mb-3 text-success"><i class="bi bi-bar-chart-line me-2"></i>Evaluasi Pemagang</h6>
+                    @if ($evaluation)
+                      <ul class="list-group mb-4">
+                        <li class="list-group-item"><strong>Kedisiplinan:</strong> {{ $evaluation->discipline ?? '-' }}</li>
+                        <li class="list-group-item"><strong>Kerja Sama Tim:</strong> {{ $evaluation->teamwork ?? '-' }}</li>
+                        <li class="list-group-item"><strong>Komunikasi:</strong> {{ $evaluation->communication ?? '-' }}
+                        </li>
+                        <li class="list-group-item"><strong>Keahlian:</strong> {{ $evaluation->skill ?? '-' }}</li>
+                        <li class="list-group-item"><strong>Tanggung Jawab:</strong>
+                          {{ $evaluation->responsibility ?? '-' }}</li>
+                        <li class="list-group-item"><strong>Catatan:</strong> {{ $evaluation->notes ?? '-' }}</li>
+                      </ul>
+                    @else
+                      <p class="text-muted mb-4">Belum ada data evaluasi.</p>
+                    @endif
+
+                    {{-- Bagian Laporan Akhir --}}
+                    <h6 class="fw-bold mb-3 text-info"><i class="bi bi-journal-richtext me-2"></i>Laporan Akhir</h6>
+                    @php
+                      $finalReport = $intern->finalReport ?? null;
+                    @endphp
+                    @if ($finalReport && $finalReport->file_path)
+                      <div class="ratio ratio-16x9 border rounded mb-3">
+                        <iframe src="{{ asset('storage/' . $finalReport->file_path) }}" class="rounded"></iframe>
+                      </div>
+                      <a href="{{ asset('storage/' . $finalReport->file_path) }}" target="_blank"
+                        class="btn btn-outline-info btn-sm">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> Buka di Tab Baru
+                      </a>
+                    @else
+                      <p class="text-muted mb-0">Belum ada laporan akhir diunggah.</p>
+                    @endif
+                  </div>
+
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- Modal Sertifikat -->
+            <div class="modal fade" id="certificateModal{{ $intern->id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                  <div class="modal-header bg-warning">
+                    <h5 class="modal-title text-dark"><i class="bi bi-file-earmark-pdf me-2"></i>Sertifikat Pemagang</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body text-center">
+                    @if ($certificate)
+                      <a href="{{ asset('storage/' . $certificate->file_path) }}" target="_blank"
+                        class="btn btn-outline-warning">
+                        <i class="bi bi-file-earmark-pdf me-1"></i> Lihat Sertifikat
+                      </a>
+                    @else
+                      <p class="text-muted mb-0">Belum ada sertifikat diunggah.</p>
+                    @endif
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           @empty
             <tr>
               <td colspan="7" class="text-center text-muted py-4">Tidak ada data pemagang selesai.</td>
@@ -222,6 +479,7 @@
           @endforelse
         </tbody>
       </table>
+
     </div>
   </div>
 

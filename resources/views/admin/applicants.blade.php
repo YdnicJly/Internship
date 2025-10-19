@@ -4,8 +4,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/png" href="{{ asset('images/logo_crop.png') }}">
-  <title>Data Pendaftar - SIMMAGANG Diskominfo</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/logo.jpg') }}">
+  <title>SIMMAGANG</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -127,11 +127,14 @@
           <select name="status" class="form-select" onchange="this.form.submit()">
             <option value="">Semua Status</option>
             <option value="submitted" {{ request('status') == 'submitted' ? 'selected' : '' }}>Dikirim</option>
-            <option value="under_review" {{ request('status') == 'under_review' ? 'selected' : '' }}>Sedang Ditinjau</option>
-            <option value="interview_scheduled" {{ request('status') == 'interview_scheduled' ? 'selected' : '' }}>Wawancara
+            <option value="under_review" {{ request('status') == 'under_review' ? 'selected' : '' }}>Sedang Ditinjau
+            </option>
+            <option value="interview" {{ request('status') == 'interview' ? 'selected' : '' }}>
+              Wawancara
               Terjadwal</option>
             <option value="accepted" {{ request('status') == 'accepted' ? 'selected' : '' }}>Diterima</option>
             <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
+            <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
           </select>
         </form>
       </div>
@@ -152,48 +155,241 @@
         </thead>
         <tbody>
           @forelse($applications as $app)
-          <tr>
-            <td>{{ $app->user->name }}</td>
-            <td>{{ $app->user->school_name ?? '-' }}</td>
-            <td>{{ $app->position->title ?? '-' }}</td>
-            <td>{{ $app->duration ?? '-' }}</td>
-            <td>{{ $app->whatsapp_number ?? '-' }}</td>
-            <td>
-              <span class="badge bg-{{ 
-                $app->status == 'submitted' ? 'secondary' :
-                ($app->status == 'under_review' ? 'warning text-dark' :
-                ($app->status == 'interview' ? 'info' :
-                ($app->status == 'accepted' ? 'success' : 'danger'))) 
-              }}">
-                {{ str_replace('_', ' ', $app->status) }}
-              </span>
-            </td>
-            <td>{{ $app->selection->score ?? '-' }}</td>
-            <td>{{ $app->created_at->format('Y-m-d') }}</td>
-            <td class="text-end">
-              <div class="action-buttons">
-                <button class="btn btn-sm btn-outline-primary" title="Lihat Detail"
-                  onclick="showApplicantDetail({{ $app->id }})">
-                  <i class="bi bi-eye"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-warning" title="Edit"
-                  data-bs-toggle="modal" data-bs-target="#editAppModal{{ $app->id }}">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <form action="" method="POST" class="d-inline">
-                  @csrf @method('DELETE')
-                  <button class="btn btn-sm btn-outline-danger" title="Hapus"
-                    onclick="return confirm('Yakin ingin menghapus pendaftar ini?')">
-                    <i class="bi bi-trash"></i>
+            <tr>
+              <td>{{ $app->user->name }}</td>
+              <td>{{ $app->user->school_name ?? '-' }}</td>
+              <td>{{ $app->position->title ?? '-' }}</td>
+              <td>{{ $app->duration ?? '-' }}</td>
+              <td>{{ $app->whatsapp_number ?? '-' }}</td>
+              <td>
+                @php
+                  $statusMap = [
+                    'submitted' => ['label' => 'Dikirim', 'class' => 'primary'],
+                    'under_review' => ['label' => 'Sedang Ditinjau', 'class' => 'warning text-dark'],
+                    'interview' => ['label' => 'Wawancara Terjadwal', 'class' => 'info'],
+                    'accepted' => ['label' => 'Diterima', 'class' => 'success'],
+                    'rejected' => ['label' => 'Ditolak', 'class' => 'danger'],
+                    'completed' => ['label' => 'Selesai', 'class' => 'secondary'],
+                  ];
+
+                  $status = $statusMap[$app->status] ?? ['label' => ucfirst($app->status), 'class' => 'secondary'];
+                @endphp
+
+                <span class="badge bg-{{ $status['class'] }}">
+                  {{ $status['label'] }}
+                </span>
+              </td>
+
+              <td>{{ $app->selection->score ?? '-' }}</td>
+              <td>{{ $app->created_at->format('Y-m-d') }}</td>
+              <td class="text-end">
+                <div class="action-buttons">
+                  <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                    data-bs-target="#detailModal{{ $app->id }}">
+                    <i class="bi bi-eye"></i>
                   </button>
-                </form>
+                  <button class="btn btn-sm btn-outline-warning" title="Edit" data-bs-toggle="modal"
+                    data-bs-target="#editAppModal{{ $app->id }}">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <form action="{{ route('admin.applicants.destroy', $app->id) }}" method="POST" class="d-inline">
+                    @csrf
+                    @method('DELETE')
+                    <button class="btn btn-sm btn-outline-danger" title="Hapus"
+                      onclick="return confirm('Yakin ingin menghapus pendaftar ini?')">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+
+                </div>
+              </td>
+            </tr>
+            <!-- Detail Modal -->
+            <div class="modal fade" id="detailModal{{ $app->id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                  <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                      <i class="bi bi-file-text me-2"></i> Detail Lamaran
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                  </div>
+
+                  <div class="modal-body">
+                    <h6 class="fw-bold mb-3">{{ $app->position->title }} - {{ $app->position->department }}</h6>
+                    <p><strong>Status:</strong>
+                      @if ($app->status === 'accepted')
+                        <span class="badge bg-success">Diterima</span>
+                      @elseif ($app->status === 'rejected')
+                        <span class="badge bg-danger">Ditolak</span>
+                      @else
+                        <span class="badge bg-warning text-dark">Sedang Ditinjau</span>
+                      @endif
+                    </p>
+
+                    <hr>
+                    <h6 class="fw-bold">Informasi Lamaran</h6>
+                    <ul class="list-unstyled">
+                      <li><strong>Email Aktif:</strong> {{ $app->active_email }}</li>
+                      <li><strong>Nomor WhatsApp:</strong> {{ $app->whatsapp_number }}</li>
+                      <li><strong>Durasi Magang:</strong> {{ $app->duration }}</li>
+                      <li><strong>Motivasi:</strong> {{ $app->motivation }}</li>
+                    </ul>
+
+                    <hr>
+                    <h6 class="fw-bold mb-2"><i class="bi bi-file-earmark-text me-2 text-success"></i>Dokumen yang
+                      Diunggah
+                    </h6>
+                    @if ($app->documents->isEmpty())
+                      <p class="text-muted">TIdak Ada Dokumen yang Diunggah.</p>
+                    @else
+                      <ul class="list-group list-group-flush">
+                        @foreach ($app->documents as $doc)
+                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="text-capitalize">{{ $doc->type }}</span>
+                            <a href="{{ asset('storage/' . $doc->path) }}" target="_blank"
+                              class="btn btn-sm btn-outline-secondary">
+                              <i class="bi bi-box-arrow-up-right"></i> Buka
+                            </a>
+                          </li>
+                        @endforeach
+                      </ul>
+                    @endif
+                  </div>
+
+                  <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">
+                      <i class="bi bi-x-circle me-1"></i> Tutup
+                    </button>
+                  </div>
+                </div>
               </div>
-            </td>
-          </tr>
+            </div>
+            <!-- Modal Edit -->
+            <div class="modal fade" id="editAppModal{{ $app->id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                  <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">
+                      <i class="bi bi-pencil-square me-2"></i> Edit Lamaran
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+
+                  <form action="{{ route('admin.applicants.update', $app->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body">
+                      <div class="row g-3">
+                        <!-- === Informasi Dasar === -->
+                        <div class="col-md-6">
+                          <label class="form-label fw-semibold">Email Aktif</label>
+                          <input type="email" name="active_email" class="form-control" value="{{ $app->active_email }}"
+                            required>
+                        </div>
+
+                        <div class="col-md-6">
+                          <label class="form-label fw-semibold">Nomor WhatsApp</label>
+                          <input type="text" name="whatsapp_number" class="form-control"
+                            value="{{ $app->whatsapp_number }}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                          <label class="form-label fw-semibold">Durasi Magang</label>
+                          <input type="text" name="duration" class="form-control" value="{{ $app->duration }}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                          <label class="form-label fw-semibold">Status</label>
+                          <select name="status" class="form-select" id="statusSelect{{ $app->id }}">
+                            <option value="submitted" {{ $app->status == 'submitted' ? 'selected' : '' }}>Dikirim</option>
+                            <option value="under_review" {{ $app->status == 'under_review' ? 'selected' : '' }}>Sedang
+                              Ditinjau</option>
+                            <option value="interview" {{ $app->status == 'interview' ? 'selected' : '' }}>Wawancara Terjadwal</option>
+                            <option value="accepted" {{ $app->status == 'accepted' ? 'selected' : '' }}>Diterima</option>
+                            <option value="rejected" {{ $app->status == 'rejected' ? 'selected' : '' }}>Ditolak</option>
+                            <option value="completed" {{ $app->status == 'completed' ? 'selected' : '' }}>Selesai</option>
+                            <option value="active" {{ $app->status == 'active' ? 'selected' : '' }}>Aktif</option>
+                          </select>
+                        </div>
+
+                        <div class="col-12">
+                          <label class="form-label fw-semibold">Motivasi</label>
+                          <textarea name="motivation" class="form-control" rows="3">{{ $app->motivation }}</textarea>
+                        </div>
+
+                        <!-- === Penilaian Seleksi === -->
+                        <div class="col-12 mt-3 border-top pt-3">
+                          <h6 class="fw-bold"><i class="bi bi-clipboard-check text-success me-2"></i> Penilaian Seleksi
+                          </h6>
+                          <div class="row g-3">
+                            <div class="col-md-4">
+                              <label class="form-label">Nilai</label>
+                              <input type="number" name="score" class="form-control"
+                                value="{{ $app->selection->score ?? '' }}">
+                            </div>
+                            <div class="col-md-4">
+                              <label class="form-label">Hasil</label>
+                              <select name="result" class="form-select">
+                                <option value="pending" {{ optional($app->selection)->result == 'pending' ? 'selected' : '' }}>Menunggu</option>
+                                <option value="passed" {{ optional($app->selection)->result == 'passed' ? 'selected' : '' }}>Lulus</option>
+                                <option value="failed" {{ optional($app->selection)->result == 'failed' ? 'selected' : '' }}>Tidak Lulus</option>
+                              </select>
+                            </div>
+                            <div class="col-md-12">
+                              <label class="form-label">Catatan</label>
+                              <textarea name="remarks" class="form-control"
+                                rows="2">{{ $app->selection->remarks ?? '' }}</textarea>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- === Jadwal Wawancara (Muncul Jika Status = interview) === -->
+                        <div class="col-12 mt-3 border-top pt-3 interview-section" id="interviewSection{{ $app->id }}"
+                          style="display: none;">
+                          <h6 class="fw-bold"><i class="bi bi-calendar-event text-info me-2"></i> Jadwal Wawancara</h6>
+                          <div class="row g-3">
+                            <div class="col-md-6">
+                              <label class="form-label">Tanggal & Waktu</label>
+                              <input type="datetime-local" name="scheduled_at" class="form-control"
+                                value="{{ optional($app->interview)->scheduled_at ? \Carbon\Carbon::parse($app->interview->scheduled_at)->format('Y-m-d\TH:i') : '' }}">
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-label">Status Wawancara</label>
+                              <select name="interview_status" class="form-select">
+                                <option value="scheduled" {{ optional($app->interview)->status == 'scheduled' ? 'selected' : '' }}>Dijadwalkan</option>
+                                <option value="done" {{ optional($app->interview)->status == 'done' ? 'selected' : '' }}>
+                                  Selesai</option>
+                                <option value="canceled" {{ optional($app->interview)->status == 'canceled' ? 'selected' : '' }}>Dibatalkan</option>
+                              </select>
+                            </div>
+                            <div class="col-md-12">
+                              <label class="form-label">Hasil / Catatan Wawancara</label>
+                              <textarea name="interview_result" class="form-control"
+                                rows="2">{{ $app->interview->result ?? '' }}</textarea>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i> Batal
+                      </button>
+                      <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-save me-1"></i> Simpan Perubahan
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
           @empty
-          <tr>
-            <td colspan="9" class="text-center text-muted py-4">Tidak ada data pendaftar.</td>
-          </tr>
+            <tr>
+              <td colspan="9" class="text-center text-muted py-4">Tidak ada data pendaftar.</td>
+            </tr>
           @endforelse
         </tbody>
       </table>
@@ -248,6 +444,26 @@
       });
     });
   </script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Ambil semua elemen select status yang ada di halaman
+    document.querySelectorAll('[id^="statusSelect"]').forEach(select => {
+      const appId = select.id.replace('statusSelect', '');
+      const interviewSection = document.getElementById('interviewSection' + appId);
+
+      function toggleInterviewSection() {
+        if (!interviewSection) return;
+        interviewSection.style.display = select.value === 'interview' ? 'block' : 'none';
+      }
+
+      // Jalankan pertama kali ketika modal dibuka
+      toggleInterviewSection();
+
+      // Jalankan setiap kali status diganti
+      select.addEventListener('change', toggleInterviewSection);
+    });
+  });
+</script>
 
 </body>
 

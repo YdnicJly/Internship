@@ -13,6 +13,8 @@ use App\Models\Evaluation;
 use App\Models\Certificate;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class AdminInternController extends Controller
 {
@@ -84,6 +86,42 @@ public function index()
 
     return redirect()->back()->with('success', 'Intern has been deleted successfully.');
 }
+public function storeEvaluation(Request $request, $id)
+{
+    $validated = $request->validate([
+        'discipline' => 'required|integer|min:0|max:100',
+        'teamwork' => 'required|integer|min:0|max:100',
+        'communication' => 'required|integer|min:0|max:100',
+        'skill' => 'required|integer|min:0|max:100',
+        'responsibility' => 'required|integer|min:0|max:100',
+        'notes' => 'nullable|string',
+    ]);
 
+    $intern = User::findOrFail($id);
+
+    $intern->evaluations()->create($validated);
+
+    return redirect()->back()->with('success', 'Evaluasi berhasil ditambahkan.');
+}
+
+public function storeCertificate(Request $request, $id)
+{
+    $validated = $request->validate([
+        'certificate_file' => 'required|mimes:pdf|max:2048',
+    ]);
+
+    $intern = User::findOrFail($id);
+
+    if ($request->hasFile('certificate_file')) {
+        $path = $request->file('certificate_file')->store('certificates', 'public');
+
+        $intern->certificate()->create([
+            'file_path' => $path,
+            'issued_date' => now(),
+        ]);
+    }
+
+    return redirect()->back()->with('success', 'Sertifikat berhasil diupload.');
+}
 
 }

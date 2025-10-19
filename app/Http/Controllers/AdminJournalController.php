@@ -2,24 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Position;
-use App\Models\Application;
-use Illuminate\Http\Request;
+use App\Models\Journal;
 
 class AdminJournalController extends Controller
 {
-    public function index(Request $request)
+    public function show($id)
     {
-        $query = Application::with(['user', 'position']);
+        // Ambil data user (intern)
+        $intern = User::with('journals')->findOrFail($id);
 
-        if ($request->has('status') && $request->status != '') {
-            $query->where('status', $request->status);
-        }
+        // Ambil jurnal berdasarkan user_id
+        $journals = Journal::where('user_id', $intern->id)
+            ->orderBy('date', 'asc')
+            ->get();
 
-        $applications = $query->latest()->paginate(10);
-
-        return view('admin.applicants', compact('applications'));
+        return view('admin.journal', compact('intern', 'journals'));
     }
-
 }

@@ -69,7 +69,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/applicants', [AdminApplicantController::class, 'index'])->name('admin.applicants');
     Route::get('/applicants/{id}', [AdminApplicantController::class, 'show'])->name('applicants.show');
     Route::post('/applicants/{id}/score', [AdminApplicantController::class, 'updateScore'])->name('applicants.score');
-
+    Route::put('/applicants/{id}', [AdminApplicantController::class, 'update'])->name('admin.applicants.update');
+    Route::delete('/applicants/{id}', [AdminApplicantController::class, 'destroy'])->name('admin.applicants.destroy');
 
     Route::get('/interviews', [AdminInterviewController::class, 'index'])->name('admin.interviews');
     Route::post('/interviews', [AdminInterviewController::class, 'store'])->name('admin.interviews.store');
@@ -81,6 +82,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::put('/admin/intern/{id}', [AdminInternController::class, 'update'])->name('admin.intern.update');
     Route::delete('/admin/intern/{id}', [AdminInternController::class, 'destroy'])->name('admin.intern.destroy');
 
+    // ✅ Tambahan:
+    Route::get('/intern/{id}/journals', [AdminJournalController::class, 'show'])->name('admin.intern.journals');
+    Route::post('/intern/{id}/evaluation', [AdminInternController::class, 'storeEvaluation'])->name('admin.intern.evaluation.store');
+    Route::post('/intern/{id}/certificate', [AdminInternController::class, 'storeCertificate'])->name('admin.intern.certificate.store');
 
     // Journal & Evaluation pages
     Route::get('/admin/intern/{user}/journal', [AdminJournalController::class, 'show'])->name('admin.journals.show');

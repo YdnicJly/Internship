@@ -19,7 +19,7 @@ class AdminEvaluationController extends Controller
 
         $applications = $query->latest()->paginate(10);
 
-        return view('admin.applicants', compact('applications'));
+        return view('admin.intern', compact('applications'));
     }
 
 }
