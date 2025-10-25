@@ -68,7 +68,7 @@
                 <li><a href="{{ route('student.dashboard') }}" class="nav-link active"><i
                             class="bi bi-briefcase me-2"></i> Beranda</a></li>
                 <li><a href="{{ route('student.applications') }}" class="nav-link"><i
-                            class="bi bi-clipboard-check me-2"></i> Lamaran saya</a></li>
+                            class="bi bi-clipboard-check me-2"></i> Lamaran Saya</a></li>
                 <li><a href="{{ route('student.journal') }}" class="nav-link"><i class="bi bi-journal-text me-2"></i>
                         Jurnal Magang
                     </a></li>
@@ -269,34 +269,37 @@
 
                                             <hr class="my-3">
 
-                                            <h6 class="fw-bold"><i
-                                                    class="bi bi-file-earmark-arrow-up me-2 text-success"></i>Unggah
-                                                Dokumen</h6>
-                                            <p class="small text-muted">Format yang diterima: PDF, ukuran maksimum 2MB per
-                                                file.</p>
+                                            <h6 class="fw-bold">
+                                                <i class="bi bi-file-earmark-arrow-up me-2 text-success"></i>Unggah Dokumen
+                                            </h6>
+                                            <p class="small text-muted">
+                                                Format yang diterima: PDF, ukuran maksimum 2MB per file.
+                                            </p>
 
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Curriculum Vitae (CV)</label>
-                                                <input type="file" name="documents[cv]" class="form-control" accept=".pdf"
-                                                    required>
-                                            </div>
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-semibold">Curriculum Vitae (CV)</label>
+                                                    <input type="file" name="documents[cv]" class="form-control file-input"
+                                                        accept=".pdf" required>
+                                                </div>
 
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Surat Rekomendasi</label>
-                                                <input type="file" name="documents[recommendation]" class="form-control"
-                                                    accept=".pdf">
-                                            </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-semibold">Surat Rekomendasi</label>
+                                                    <input type="file" name="documents[recommendation]"
+                                                        class="form-control file-input" accept=".pdf">
+                                                </div>
 
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Portofolio (opsional)</label>
-                                                <input type="file" name="documents[portfolio]" class="form-control"
-                                                    accept=".pdf">
-                                            </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-semibold">Portofolio (opsional)</label>
+                                                    <input type="file" name="documents[portfolio]"
+                                                        class="form-control file-input" accept=".pdf">
+                                                </div>
 
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Transkrip (opsional)</label>
-                                                <input type="file" name="documents[transcript]" class="form-control"
-                                                    accept=".pdf">
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-semibold">Transkrip (opsional)</label>
+                                                    <input type="file" name="documents[transcript]"
+                                                        class="form-control file-input" accept=".pdf">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -350,7 +353,17 @@
             </div>
         </div>
     </div>
-
+    <script>
+        document.querySelectorAll('.file-input').forEach(input => {
+            input.addEventListener('change', function () {
+                const file = this.files[0];
+                if (file && file.size > 2 * 1024 * 1024) { // 2MB = 2 * 1024 * 1024 bytes
+                    alert('Ukuran file tidak boleh lebih dari 2MB!');
+                    this.value = ''; // reset input
+                }
+            });
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

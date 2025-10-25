@@ -153,10 +153,8 @@
     <div class="col-md-6">
       <label class="form-label fw-semibold">Jenjang Pendidikan</label>
       <select name="education_level" class="form-select" required>
-        <option value="SMA/SMK" {{ Auth::user()->education_level == 'SMA/SMK' ? 'selected' : '' }}>SMA / SMK</option>
-        <option value="Diploma" {{ Auth::user()->education_level == 'Diploma' ? 'selected' : '' }}>Diploma</option>
-        <option value="Sarjana" {{ Auth::user()->education_level == 'Sarjana' ? 'selected' : '' }}>Sarjana (S1)</option>
-        <option value="Lainnya" {{ Auth::user()->education_level == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+        <option value="SMK" {{ Auth::user()->education_level == 'SMK' ? 'selected' : '' }}>SMA / SMK</option>
+        <option value="Universitas" {{ Auth::user()->education_level == 'Universitas' ? 'selected' : '' }}>Mahasiswa</option>
       </select>
     </div>
 

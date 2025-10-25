@@ -68,7 +68,7 @@
         <li><a href="{{ route('student.dashboard') }}" class="nav-link "><i class="bi bi-briefcase me-2"></i>
             Beranda</a></li>
         <li><a href="{{ route('student.applications') }}" class="nav-link active"><i
-              class="bi bi-clipboard-check me-2"></i> Lamaran saya</a></li>
+              class="bi bi-clipboard-check me-2"></i> Lamaran Saya</a></li>
         <li><a href="{{ route('student.journal') }}" class="nav-link"><i class="bi bi-journal-text me-2"></i>
             Jurnal Magang
           </a></li>
@@ -232,12 +232,18 @@
                     <td>{{ $interview->application->position->title }}</td>
                     <td>
                       <span class="badge bg-{{ 
-                                                                                    $interview->status == 'scheduled' ? 'warning text-dark' :
-            ($interview->status == 'done' ? 'success' : 'secondary')
-                                                                                  }}">
-                        {{ ucfirst($interview->status) }}
+              $interview->status == 'scheduled' ? 'warning text-dark' :
+            ($interview->status == 'done' ? 'success' :
+              ($interview->status == 'canceled' ? 'danger' : 'secondary')) 
+            }}">
+                        {{
+            $interview->status == 'scheduled' ? 'Dijadwalkan' :
+            ($interview->status == 'done' ? 'Selesai' :
+              ($interview->status == 'canceled' ? 'Gagal' : ucfirst($interview->status)))
+            }}
                       </span>
                     </td>
+
                     <td>{{ $interview->result ?? '-' }}</td>
                   </tr>
           @empty
