@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="{{ asset('images/logo.jpg') }}">
-  <title>SIMMAGANG</title>
+  <title>SIMMAGANG - Evaluasi</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -54,6 +54,18 @@
       background: white;
       border-bottom: 1px solid #dee2e6;
     }
+
+    .file-info-box {
+      background-color: #f8f9fa;
+      border-left: 4px solid #198754;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+
+    .btn-action-group {
+      display: flex;
+      gap: 0.5rem;
+    }
   </style>
 </head>
 
@@ -67,8 +79,31 @@
       <ul class="nav flex-column gap-1">
         <li><a href="{{ route('student.dashboard') }}" class="nav-link"><i class="bi bi-briefcase me-2"></i> Beranda</a></li>
         <li><a href="{{ route('student.applications') }}" class="nav-link"><i class="bi bi-clipboard-check me-2"></i> Lamaran Saya</a></li>
-        <li><a href="{{ route('student.journal') }}" class="nav-link"><i class="bi bi-journal-text me-2"></i> Jurnal Magang</a></li>
-        <li><a href="{{ route('student.evaluation') }}" class="nav-link active"><i class="bi bi-award me-2"></i> Evaluasi</a></li>
+        
+        @php
+            $hasActiveApplication = auth()
+                ->user()
+                ->applications()
+                ->where('status', 'active')
+                ->exists();
+        @endphp
+
+        @if ($hasActiveApplication)
+            <li>
+                <a href="{{ route('student.journal') }}"
+                    class="nav-link {{ request()->routeIs('student.journal') ? 'active' : '' }}">
+                    <i class="bi bi-journal-text me-2"></i> Jurnal Magang
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('student.evaluation') }}"
+                    class="nav-link {{ request()->routeIs('student.evaluation') ? 'active' : '' }}">
+                    <i class="bi bi-award me-2"></i> Evaluasi
+                </a>
+            </li>
+        @endif
+        
         <li><a href="{{ route('profile') }}" class="nav-link"><i class="bi bi-person-lines-fill me-2"></i> Profil</a></li>
       </ul>
     </div>
@@ -95,33 +130,172 @@
       </div>
     </nav>
 
+    <!-- Alert Success -->
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    <!-- Alert Error -->
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    <!-- Validation Errors -->
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Terjadi kesalahan:</strong>
+            <ul class="mb-0 mt-2">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
     <!-- Upload Laporan Akhir -->
     <div class="card p-4 mb-4">
-      <h5 class="mb-3"><i class="bi bi-upload me-2 text-primary"></i> Unggah Laporan Akhir</h5>
+      <h5 class="mb-3"><i class="bi bi-upload me-2 text-primary"></i> Laporan Akhir Magang</h5>
+      
       @if ($finalReport)
-        <div class="alert alert-success d-flex justify-content-between align-items-center">
-          <div>
-            <i class="bi bi-file-earmark-check-fill me-2"></i>
-            <strong>Sudah diunggah:</strong> {{ basename($finalReport->file_path) }} <br>
-            <small class="text-muted">Dikirim pada {{ $finalReport->created_at->format('d M Y, H:i') }}</small>
+        <!-- Tampilan jika sudah ada laporan -->
+        <div class="file-info-box mb-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+              <h6 class="mb-2">
+                <i class="bi bi-file-earmark-check-fill text-success me-2"></i>
+                <strong>Laporan Anda</strong>
+              </h6>
+              <p class="mb-1">
+                <i class="bi bi-file-text me-2"></i>
+                <span class="text-dark">{{ basename($finalReport->file_path) }}</span>
+              </p>
+              <small class="text-muted">
+                <i class="bi bi-clock me-1"></i>
+                Diunggah pada {{ $finalReport->created_at->format('d M Y, H:i') }} WIB
+              </small>
+            </div>
+            
+            <div class="btn-action-group">
+              <!-- Tombol Lihat -->
+              <a href="{{ asset($finalReport->file_path) }}" 
+                 target="_blank" 
+                 class="btn btn-success btn-sm"
+                 title="Lihat laporan">
+                <i class="bi bi-eye"></i> Lihat
+              </a>
+
+              <!-- Tombol Ubah (hilang jika sudah ada evaluasi) -->
+              @if (!$evaluation)
+                <button class="btn btn-warning btn-sm" 
+                        type="button"
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#editFinalReport"
+                        aria-expanded="false"
+                        title="Ubah laporan">
+                  <i class="bi bi-pencil-square"></i> Ubah
+                </button>
+              @else
+                <button class="btn btn-secondary btn-sm" 
+                        disabled 
+                        title="Tidak dapat diubah setelah evaluasi tersedia">
+                  <i class="bi bi-lock"></i> Terkunci
+                </button>
+              @endif
+            </div>
           </div>
-          <a href="{{ asset('storage/' . $finalReport->file_path) }}" target="_blank"
-            class="btn btn-outline-success btn-sm">
-            <i class="bi bi-eye"></i> Lihat
-          </a>
         </div>
-      @else
-        <form action="{{ route('finalreport.store') }}" method="POST" enctype="multipart/form-data">
-          @csrf
-          <div class="row g-3 align-items-center">
-            <div class="col-md-8">
-              <input type="file" name="file" accept=".pdf,.doc,.docx" class="form-control" required>
-              <small class="text-muted">Format yang diterima: PDF, DOC, DOCX (maks. 5MB)</small>
-            </div>
-            <div class="col-md-4 text-end">
-              <button type="submit" class="btn btn-primary"><i class="bi bi-cloud-arrow-up me-1"></i> Unggah Laporan</button>
+
+        <!-- Form Ubah Laporan (Collapse) -->
+        @if (!$evaluation)
+          <div class="collapse" id="editFinalReport">
+            <div class="card card-body bg-light">
+              <h6 class="mb-3"><i class="bi bi-arrow-repeat me-2"></i> Perbarui Laporan Akhir</h6>
+              <form action="{{ route('student.finalreport.update', $finalReport->id) }}" 
+                    method="POST" 
+                    enctype="multipart/form-data"
+                    onsubmit="return confirm('Apakah Anda yakin ingin memperbarui laporan ini?')">
+                @csrf
+                @method('PUT')
+                
+                <div class="mb-3">
+                  <label for="file" class="form-label">Pilih File Baru</label>
+                  <input type="file" 
+                         class="form-control @error('file') is-invalid @enderror" 
+                         id="file"
+                         name="file" 
+                         accept=".pdf,.doc,.docx" 
+                         required>
+                  <div class="form-text">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Format: PDF, DOC, DOCX (Maksimal 5MB)
+                  </div>
+                  @error('file')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                  @enderror
+                </div>
+
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-arrow-repeat me-1"></i> Perbarui Laporan
+                  </button>
+                  <button type="button" 
+                          class="btn btn-secondary" 
+                          data-bs-toggle="collapse" 
+                          data-bs-target="#editFinalReport">
+                    <i class="bi bi-x-circle me-1"></i> Batal
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
+        @endif
+
+      @else
+        <!-- Form Upload Pertama Kali -->
+        <div class="alert alert-info" role="alert">
+          <i class="bi bi-info-circle-fill me-2"></i>
+          Anda belum mengunggah laporan akhir. Silakan unggah file laporan Anda.
+        </div>
+
+        <form action="{{ route('student.finalreport.store') }}" 
+              method="POST" 
+              enctype="multipart/form-data"
+              onsubmit="return confirm('Pastikan file yang akan diunggah sudah benar. Lanjutkan?')">
+          @csrf
+          
+          <div class="mb-3">
+            <label for="file" class="form-label">
+              <i class="bi bi-file-earmark-arrow-up me-2"></i>
+              Pilih File Laporan Akhir
+            </label>
+            <input type="file" 
+                   class="form-control @error('file') is-invalid @enderror" 
+                   id="file"
+                   name="file" 
+                   accept=".pdf,.doc,.docx" 
+                   required>
+            <div class="form-text">
+              <i class="bi bi-info-circle me-1"></i>
+              Format yang diterima: PDF, DOC, DOCX (Maksimal 5MB)
+            </div>
+            @error('file')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-cloud-arrow-up me-1"></i> Unggah Laporan
+          </button>
         </form>
       @endif
     </div>
@@ -129,29 +303,59 @@
     <!-- Hasil Evaluasi -->
     <div class="card p-4 mb-4">
       <h5 class="mb-3"><i class="bi bi-clipboard-data me-2 text-success"></i> Hasil Evaluasi</h5>
+      
       @if ($evaluation)
+        <div class="alert alert-success mb-3">
+          <i class="bi bi-check-circle-fill me-2"></i>
+          Evaluasi Anda telah tersedia
+        </div>
+
         <div class="table-responsive">
           <table class="table table-bordered align-middle">
             <thead class="table-light">
               <tr>
-                <th>Kriteria</th>
-                <th>Nilai</th>
+                <th width="60%">Kriteria Penilaian</th>
+                <th width="40%" class="text-center">Nilai</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td>Kedisiplinan</td><td>{{ $evaluation->discipline ?? '-' }}</td></tr>
-              <tr><td>Kerja Sama Tim</td><td>{{ $evaluation->teamwork ?? '-' }}</td></tr>
-              <tr><td>Komunikasi</td><td>{{ $evaluation->communication ?? '-' }}</td></tr>
-              <tr><td>Kompetensi Keahlian</td><td>{{ $evaluation->skill ?? '-' }}</td></tr>
-              <tr><td>Tanggung Jawab</td><td>{{ $evaluation->responsibility ?? '-' }}</td></tr>
+              <tr>
+                <td><i class="bi bi-clock-fill text-primary me-2"></i> Kedisiplinan</td>
+                <td class="text-center"><strong>{{ $evaluation->discipline ?? '-' }}</strong></td>
+              </tr>
+              <tr>
+                <td><i class="bi bi-people-fill text-primary me-2"></i> Kerja Sama Tim</td>
+                <td class="text-center"><strong>{{ $evaluation->teamwork ?? '-' }}</strong></td>
+              </tr>
+              <tr>
+                <td><i class="bi bi-chat-dots-fill text-primary me-2"></i> Komunikasi</td>
+                <td class="text-center"><strong>{{ $evaluation->communication ?? '-' }}</strong></td>
+              </tr>
+              <tr>
+                <td><i class="bi bi-gear-fill text-primary me-2"></i> Kompetensi Keahlian</td>
+                <td class="text-center"><strong>{{ $evaluation->skill ?? '-' }}</strong></td>
+              </tr>
+              <tr>
+                <td><i class="bi bi-shield-check text-primary me-2"></i> Tanggung Jawab</td>
+                <td class="text-center"><strong>{{ $evaluation->responsibility ?? '-' }}</strong></td>
+              </tr>
             </tbody>
           </table>
-          <p><strong>Catatan:</strong> {{ $evaluation->notes ?? '-' }}</p>
         </div>
+
+        @if ($evaluation->notes)
+          <div class="mt-3">
+            <h6><i class="bi bi-chat-left-text me-2"></i> Catatan Pembimbing:</h6>
+            <div class="alert alert-light border">
+              {{ $evaluation->notes }}
+            </div>
+          </div>
+        @endif
       @else
-        <div class="text-center text-muted py-3">
-          <i class="bi bi-hourglass-split display-6 d-block mb-2"></i>
-          Hasil evaluasi belum tersedia.
+        <div class="text-center text-muted py-5">
+          <i class="bi bi-hourglass-split display-4 d-block mb-3 text-secondary"></i>
+          <p class="mb-0">Hasil evaluasi belum tersedia.</p>
+          <small>Pembimbing akan memberikan evaluasi setelah meninjau laporan Anda.</small>
         </div>
       @endif
     </div>
@@ -159,22 +363,31 @@
     <!-- Sertifikat Magang -->
     <div class="card p-4">
       <h5 class="mb-3"><i class="bi bi-award-fill me-2 text-warning"></i> Sertifikat Magang</h5>
+      
       @if ($certificate)
         <div class="d-flex justify-content-between align-items-center alert alert-light border">
           <div>
-            <i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>
-            <strong>{{ basename($certificate->file_path) }}</strong><br>
-            <small class="text-muted">Diterbitkan pada {{ $certificate->created_at->format('d M Y') }}</small>
+            <h6 class="mb-1">
+              <i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>
+              <strong>{{ basename($certificate->file_path) }}</strong>
+            </h6>
+            <small class="text-muted">
+              <i class="bi bi-calendar-check me-1"></i>
+              Diterbitkan pada {{ $certificate->created_at->format('d M Y') }}
+            </small>
           </div>
-          <a href="{{ asset('storage/' . $certificate->file_path) }}" target="_blank"
-            class="btn btn-outline-primary btn-sm">
-            <i class="bi bi-download"></i> Unduh
+          <a href="{{ asset($certificate->file_path) }}" 
+             target="_blank"
+             download
+             class="btn btn-primary btn-sm">
+            <i class="bi bi-download"></i> Unduh Sertifikat
           </a>
         </div>
       @else
-        <div class="text-center text-muted py-3">
-          <i class="bi bi-hourglass-split display-6 d-block mb-2"></i>
-          Sertifikat belum tersedia.
+        <div class="text-center text-muted py-5">
+          <i class="bi bi-award display-4 d-block mb-3 text-secondary"></i>
+          <p class="mb-0">Sertifikat belum tersedia.</p>
+          <small>Sertifikat akan diterbitkan setelah Anda menyelesaikan seluruh proses magang.</small>
         </div>
       @endif
     </div>
@@ -185,15 +398,23 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow">
         <div class="modal-header bg-danger text-white">
-          <h5 class="modal-title" id="logoutModalLabel"><i class="bi bi-box-arrow-right me-2"></i>Konfirmasi Keluar</h5>
+          <h5 class="modal-title" id="logoutModalLabel">
+            <i class="bi bi-box-arrow-right me-2"></i>Konfirmasi Keluar
+          </h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
         </div>
-        <div class="modal-body">Apakah Anda yakin ingin keluar dari akun ini?</div>
+        <div class="modal-body">
+          Apakah Anda yakin ingin keluar dari akun ini?
+        </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i> Batal</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> Batal
+          </button>
           <form action="{{ route('logout') }}" method="POST" class="d-inline">
             @csrf
-            <button type="submit" class="btn btn-danger"><i class="bi bi-box-arrow-right me-1"></i> Keluar</button>
+            <button type="submit" class="btn btn-danger">
+              <i class="bi bi-box-arrow-right me-1"></i> Keluar
+            </button>
           </form>
         </div>
       </div>
@@ -201,6 +422,17 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Auto-hide success alert after 3 seconds
+    setTimeout(() => {
+      const alert = document.getElementById('success-alert');
+      if (alert) {
+        const bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+      }
+    }, 3000);
+  </script>
 </body>
 
 </html>

@@ -9,7 +9,15 @@ class Evaluation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'score', 'feedback'];
+    protected $fillable = [
+        'user_id',
+        'discipline',
+        'teamwork',
+        'communication',
+        'skill',
+        'responsibility',
+        'notes',
+    ];
 
     public function user()
     {

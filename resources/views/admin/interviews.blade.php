@@ -108,7 +108,26 @@
         </div>
       </div>
     </nav>
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 
+    <script>
+        // Tunggu 3 detik lalu sembunyikan alert
+        setTimeout(() => {
+            const alert = document.getElementById('success-alert');
+            if (alert) {
+                // Tambahkan animasi fade out
+                alert.classList.remove('show');
+                alert.classList.add('fade');
+                // Hapus elemen dari DOM setelah 500ms (animasi Bootstrap)
+                setTimeout(() => alert.remove(), 500);
+            }
+        }, 3000);
+    </script>
+@endif
     <div class="card p-4">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h5 class="mb-0"><i class="bi bi-calendar-check text-primary me-2"></i> Semua Jadwal Wawancara</h5>
@@ -134,13 +153,18 @@
               {{ $interview->scheduled_at ? \Carbon\Carbon::parse($interview->scheduled_at)->format('Y-m-d H:i') : '-' }}
             </td>
             <td>
-              <span class="badge bg-{{
-                $interview->status == 'scheduled' ? 'warning text-dark' :
-                ($interview->status == 'done' ? 'success' : 'secondary')
-              }}">
-                {{ ucfirst($interview->status) }}
-              </span>
-            </td>
+                      <span class="badge bg-{{ 
+              $interview->status == 'scheduled' ? 'warning text-dark' :
+            ($interview->status == 'done' ? 'success' :
+              ($interview->status == 'canceled' ? 'danger' : 'secondary')) 
+            }}">
+                        {{
+            $interview->status == 'scheduled' ? 'Dijadwalkan' :
+            ($interview->status == 'done' ? 'Selesai' :
+              ($interview->status == 'canceled' ? 'Gagal' : ucfirst($interview->status)))
+            }}
+                      </span>
+                    </td>
             <td>{{ $interview->result ?? '-' }}</td>
             <td class="text-end">
               <div class="action-buttons">

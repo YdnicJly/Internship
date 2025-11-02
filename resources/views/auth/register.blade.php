@@ -18,58 +18,87 @@
 
         <div class="row g-2">
           <div class="col-md-6 mb-3">
-            <label class="form-label">Nama Lengkap</label>
-            <input type="text" class="form-control" name="name" required>
+            <label class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+            <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
+                   value="{{ old('name') }}" required>
+            @error('name')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
 
           <div class="col-md-6 mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" class="form-control" name="email" required>
-          </div>
-        </div>
-
-        <div class="row g-2">
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Asal Sekolah / Universitas</label>
-            <input type="text" class="form-control" name="school_name" required>
-          </div>
-
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Jurusan</label>
-            <input type="text" class="form-control" name="major" required>
+            <label class="form-label">Email <span class="text-danger">*</span></label>
+            <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
+                   value="{{ old('email') }}" required>
+            @error('email')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
         </div>
 
         <div class="row g-2">
           <div class="col-md-6 mb-3">
-            <label class="form-label">Jenjang Pendidikan</label>
-            <select name="education_level" class="form-select" required>
+            <label class="form-label">Asal Sekolah / Universitas <span class="text-danger">*</span></label>
+            <input type="text" name="school_name" class="form-control @error('school_name') is-invalid @enderror"
+                   value="{{ old('school_name') }}" required>
+            @error('school_name')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Jurusan <span class="text-danger">*</span></label>
+            <input type="text" name="major" class="form-control @error('major') is-invalid @enderror"
+                   value="{{ old('major') }}" required>
+            @error('major')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+          </div>
+        </div>
+
+        <div class="row g-2">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Jenjang Pendidikan <span class="text-danger">*</span></label>
+            <select name="education_level" class="form-select @error('education_level') is-invalid @enderror" required>
               <option value="">-- Pilih --</option>
-              <option value="SMK">SMK</option>
-              <option value="Universitas">Mahasiswa</option>
+              <option value="SMK" {{ old('education_level') == 'SMK' ? 'selected' : '' }}>SMK</option>
+              <option value="Universitas" {{ old('education_level') == 'Universitas' ? 'selected' : '' }}>Mahasiswa</option>
             </select>
+            @error('education_level')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
 
           <div class="col-md-6 mb-3">
-            <label class="form-label">Nomor Telepon</label>
-            <input type="text" class="form-control" name="phone" required>
+            <label class="form-label">Nomor Telepon <span class="text-danger">*</span></label>
+            <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror"
+                   value="{{ old('phone') }}" required>
+            @error('phone')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Alamat</label>
-          <textarea name="address" class="form-control" rows="2" required></textarea>
+          <label class="form-label">Alamat <span class="text-danger">*</span></label>
+          <textarea name="address" rows="2" class="form-control @error('address') is-invalid @enderror" required>{{ old('address') }}</textarea>
+          @error('address')
+            <div class="invalid-feedback">{{ $message }}</div>
+          @enderror
         </div>
 
         <div class="row g-2">
           <div class="col-md-6 mb-3">
-            <label class="form-label">Password</label>
-            <input type="password" class="form-control" name="password" required>
+            <label class="form-label">Password <span class="text-danger">*</span></label>
+            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" required>
+            @error('password')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
 
           <div class="col-md-6 mb-3">
-            <label class="form-label">Konfirmasi Password</label>
-            <input type="password" class="form-control" name="password_confirmation" required>
+            <label class="form-label">Konfirmasi Password <span class="text-danger">*</span></label>
+            <input type="password" name="password_confirmation" class="form-control" required>
           </div>
         </div>
 
@@ -88,5 +117,28 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+    @if (session('success'))
+      Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: "{{ session('success') }}",
+        showConfirmButton: false,
+        timer: 2000
+      });
+    @endif
+
+    @if (session('error'))
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal!',
+        text: "{{ session('error') }}",
+        showConfirmButton: true,
+      });
+    @endif
+  </script>
+
 </body>
 </html>

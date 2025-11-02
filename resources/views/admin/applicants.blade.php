@@ -118,7 +118,26 @@
         </div>
       </div>
     </nav>
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 
+    <script>
+        // Tunggu 3 detik lalu sembunyikan alert
+        setTimeout(() => {
+            const alert = document.getElementById('success-alert');
+            if (alert) {
+                // Tambahkan animasi fade out
+                alert.classList.remove('show');
+                alert.classList.add('fade');
+                // Hapus elemen dari DOM setelah 500ms (animasi Bootstrap)
+                setTimeout(() => alert.remove(), 500);
+            }
+        }, 3000);
+    </script>
+@endif
     <!-- Filter + Table -->
     <div class="card p-4">
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -134,7 +153,6 @@
               Terjadwal</option>
             <option value="accepted" {{ request('status') == 'accepted' ? 'selected' : '' }}>Diterima</option>
             <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
-            <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
           </select>
         </form>
       </div>
@@ -247,7 +265,7 @@
                         @foreach ($app->documents as $doc)
                           <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span class="text-capitalize">{{ $doc->type }}</span>
-                            <a href="{{ asset('storage/' . $doc->path) }}" target="_blank"
+                            <a href="{{ asset($doc->path) }}" target="_blank"
                               class="btn btn-sm btn-outline-secondary">
                               <i class="bi bi-box-arrow-up-right"></i> Buka
                             </a>
@@ -285,18 +303,18 @@
                         <div class="col-md-6">
                           <label class="form-label fw-semibold">Email Aktif</label>
                           <input type="email" name="active_email" class="form-control" value="{{ $app->active_email }}"
-                            required>
+                            disabled>
                         </div>
 
                         <div class="col-md-6">
                           <label class="form-label fw-semibold">Nomor WhatsApp</label>
                           <input type="text" name="whatsapp_number" class="form-control"
-                            value="{{ $app->whatsapp_number }}" required>
+                            value="{{ $app->whatsapp_number }}" disabled>
                         </div>
 
                         <div class="col-md-6">
                           <label class="form-label fw-semibold">Durasi Magang</label>
-                          <input type="text" name="duration" class="form-control" value="{{ $app->duration }}" required>
+                          <input type="text" name="duration" class="form-control" value="{{ $app->duration }}" disabled>
                         </div>
 
                         <div class="col-md-6">
@@ -315,7 +333,7 @@
 
                         <div class="col-12">
                           <label class="form-label fw-semibold">Motivasi</label>
-                          <textarea name="motivation" class="form-control" rows="3">{{ $app->motivation }}</textarea>
+                          <textarea disabled name="motivation" class="form-control" rows="3">{{ $app->motivation }}</textarea>
                         </div>
 
                         <!-- === Penilaian Seleksi === -->

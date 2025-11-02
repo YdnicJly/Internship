@@ -21,27 +21,29 @@ class AuthController extends Controller
      * Proses login user.
      */
     public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|string',
+    ]);
 
-        $credentials = $request->only('email', 'password');
+    $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials, $request->remember)) {
-            $request->session()->regenerate();
+    if (Auth::attempt($credentials, $request->remember)) {
+        $request->session()->regenerate();
 
-            // Redirect sesuai role
-            if (Auth::user()->role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            }
-
-            return redirect()->route('student.dashboard');
+        if (Auth::user()->role === 'admin') {
+            return redirect()->route('admin.dashboard')
+                ->with('success', 'Login berhasil! Selamat datang, Admin.');
         }
 
-        return back()->with('error', 'Email atau password salah.');
+        return redirect()->route('student.dashboard')
+            ->with('success', 'Login berhasil! Selamat datang kembali.');
     }
+
+    return back()->with('error', 'Email atau password salah.');
+}
+
 
     /**
      * Tampilkan halaman register.
@@ -54,17 +56,24 @@ class AuthController extends Controller
     /**
      * Proses registrasi user baru.
      */
-    public function register(Request $request)
-    {
+  public function register(Request $request)
+{
+    try {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|confirmed|min:6',
             'school_name' => 'required|string|max:255',
             'major' => 'required|string|max:255',
             'education_level' => 'required|string',
             'phone' => 'required|string|max:20',
             'address' => 'required|string|max:255',
+        ], [
+            // Pesan error khusus
+            'email.unique' => 'Email telah terdaftar.',
+            'password.confirmed' => 'Kata sandi tidak cocok.',
+            'password.min' => 'Kata sandi minimal harus 6 karakter.',
+            'required' => 'Bagian ini wajib diisi.',
         ]);
 
         $user = User::create([
@@ -81,8 +90,19 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('student.dashboard')->with('success', 'Registrasi berhasil!');
+        return redirect()->route('student.dashboard')->with('success', 'Registrasi berhasil! Selamat datang.');
+    } 
+    catch (\Illuminate\Validation\ValidationException $e) {
+        // Ambil pesan error pertama dari validasi
+        $firstError = collect($e->errors())->flatten()->first();
+        return back()->with('error', $firstError)->withInput();
+    } 
+    catch (\Exception $e) {
+        // Error lain (misalnya database)
+        return back()->with('error', 'Terjadi kesalahan saat mendaftar. Silakan coba lagi.')->withInput();
     }
+}
+
 
     /**
      * Logout user.

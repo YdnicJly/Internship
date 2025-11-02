@@ -6,6 +6,8 @@
   <link rel="icon" type="image/png" href="{{ asset('images/logo.jpg') }}">
   <title>SIMMAGANG</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-light">
 
@@ -13,20 +15,16 @@
     <div class="card shadow-lg p-4" style="width: 400px;">
       <h4 class="text-center mb-4">SIMMAGANG</h4>
 
-      @if (session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-      @endif
-
       <form method="POST" action="{{ route('login') }}">
         @csrf
 
         <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
+          <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
           <input type="email" class="form-control" name="email" id="email" required autofocus>
         </div>
 
         <div class="mb-3">
-          <label for="password" class="form-label">Password</label>
+          <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
           <input type="password" class="form-control" name="password" id="password" required>
         </div>
 
@@ -40,7 +38,6 @@
 
         <button type="submit" class="btn btn-primary w-100 mb-2">Masuk</button>
 
-        {{-- Back to landing --}}
         <a href="{{ url('/') }}" class="btn btn-outline-secondary w-100">
           ← Kembali ke Beranda
         </a>
@@ -53,5 +50,27 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  {{-- SweetAlert Pesan Login --}}
+  <script>
+    @if (session('success'))
+      Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: "{{ session('success') }}",
+        showConfirmButton: false,
+        timer: 1800
+      });
+    @endif
+
+    @if (session('error'))
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal!',
+        text: "{{ session('error') }}",
+        showConfirmButton: true,
+      });
+    @endif
+  </script>
 </body>
 </html>

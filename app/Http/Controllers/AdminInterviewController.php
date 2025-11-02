@@ -36,7 +36,7 @@ class AdminInterviewController extends Controller
         Interview::create($request->only('application_id', 'scheduled_at', 'status', 'result'));
 
         return redirect()->route('admin.interviews')
-            ->with('success', 'Interview schedule created successfully.');
+            ->with('success', 'Data Interview Berhasil dibuat.');
     }
 
     /**
@@ -59,7 +59,7 @@ class AdminInterviewController extends Controller
         ]);
 
         return redirect()->route('admin.interviews')
-            ->with('success', 'Interview updated successfully.');
+            ->with('success', 'Data Interview Berhasil diperbarui.');
     }
 
     /**
@@ -71,6 +71,6 @@ class AdminInterviewController extends Controller
         $interview->delete();
 
         return redirect()->route('admin.interviews')
-            ->with('success', 'Interview deleted successfully.');
+            ->with('success', 'Data Interview Berhasil dihapus.');
     }
 }

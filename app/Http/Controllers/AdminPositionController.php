@@ -33,7 +33,7 @@ class AdminPositionController extends Controller
 
         Position::create($validated);
 
-        return redirect()->route('admin.positions')->with('success', 'Position created successfully.');
+        return redirect()->route('admin.positions')->with('success', 'Lowongan Berhasil dibuat.');
     }
 
     /**
@@ -53,7 +53,7 @@ class AdminPositionController extends Controller
 
         $position->update($validated);
 
-        return redirect()->route('admin.positions')->with('success', 'Position updated successfully.');
+        return redirect()->route('admin.positions')->with('success', 'Lowongan Berhasil diperbarui.');
     }
 
     /**
@@ -62,6 +62,6 @@ class AdminPositionController extends Controller
     public function destroy(Position $position)
     {
         $position->delete();
-        return redirect()->route('admin.positions')->with('success', 'Position deleted successfully.');
+        return redirect()->route('admin.positions')->with('success', 'Lowongan Berhasil dihapus.');
     }
 }

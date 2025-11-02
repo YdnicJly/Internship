@@ -79,7 +79,7 @@
             Data Pemagang
           </a></li>
         <li><a href="{{ route('admin.user') }}" class="nav-link "><i
-              class="bi bi-person-gear me-2"></i>Manajemen Pengguna</a></li>
+              class="bi bi-person-gear me-2"></i> Manajemen Pengguna</a></li>
       </ul>
     </div>
 
@@ -237,6 +237,19 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+@if (session('success'))
+  Swal.fire({
+    icon: 'success',
+    title: 'Berhasil!',
+    text: "{{ session('success') }}",
+    showConfirmButton: false,
+    timer: 1800
+  });
+@endif
+</script>
+
 </body>
 
 </html>

@@ -45,10 +45,9 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
 
     Route::get('/student/evaluation', [EvaluationController::class, 'index'])->name('student.evaluation');
+    Route::put('/student/finalreport/{id}', [EvaluationController::class, 'updateFinalReport'])->name('student.finalreport.update');
 
-
-    Route::post('final-report', [EvaluationController::class, 'storeFinalReport'])->name('finalreport.store');
-    Route::post('/student/final-report', [StudentController::class, 'report'])->name('student.finalreport.store');
+    Route::post('final-report', [EvaluationController::class, 'storeFinalReport'])->name('student.finalreport.store');
 
     Route::get('/studentprofile', [StudentProfileController::class, 'index'])->name('profile');
     Route::put('profile/update', [StudentProfileController::class, 'update'])->name('profile.update');

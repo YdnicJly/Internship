@@ -107,6 +107,26 @@
         </div>
       </div>
     </nav>
+    @if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <script>
+        // Tunggu 3 detik lalu sembunyikan alert
+        setTimeout(() => {
+            const alert = document.getElementById('success-alert');
+            if (alert) {
+                // Tambahkan animasi fade out
+                alert.classList.remove('show');
+                alert.classList.add('fade');
+                // Hapus elemen dari DOM setelah 500ms (animasi Bootstrap)
+                setTimeout(() => alert.remove(), 500);
+            }
+        }, 3000);
+    </script>
+@endif
   <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div>

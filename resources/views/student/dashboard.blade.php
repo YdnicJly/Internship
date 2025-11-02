@@ -59,34 +59,69 @@
 
 <body>
     <!-- Sidebar -->
-    <div class="sidebar p-3">
-        <div>
-            <h5 class="fw-bold mb-4 d-flex align-items-center">
-                <i class="bi bi-person-workspace me-2"></i> SIMMAGANG
-            </h5>
-            <ul class="nav flex-column gap-1">
-                <li><a href="{{ route('student.dashboard') }}" class="nav-link active"><i
-                            class="bi bi-briefcase me-2"></i> Beranda</a></li>
-                <li><a href="{{ route('student.applications') }}" class="nav-link"><i
-                            class="bi bi-clipboard-check me-2"></i> Lamaran Saya</a></li>
-                <li><a href="{{ route('student.journal') }}" class="nav-link"><i class="bi bi-journal-text me-2"></i>
-                        Jurnal Magang
-                    </a></li>
-                <li><a href="{{ route('student.evaluation') }}" class="nav-link"><i class="bi bi-award me-2"></i>
-                        Evaluasi</a></li>
-                <li><a href="{{ route('profile') }}" class="nav-link"><i class="bi bi-person-lines-fill me-2"></i>
-                        Profil</a></li>
-            </ul>
-        </div>
+<div class="sidebar p-3">
+    <div>
+        <h5 class="fw-bold mb-4 d-flex align-items-center">
+            <i class="bi bi-person-workspace me-2"></i> SIMMAGANG
+        </h5>
+        <ul class="nav flex-column gap-1">
+            <li>
+                <a href="{{ route('student.dashboard') }}"
+                    class="nav-link {{ request()->routeIs('student.dashboard') ? 'active' : '' }}">
+                    <i class="bi bi-briefcase me-2"></i> Beranda
+                </a>
+            </li>
 
-        <div>
-            <hr class="text-white-50">
-            <button type="button" class="btn btn-outline-light w-100" data-bs-toggle="modal"
-                data-bs-target="#logoutModal">
-                <i class="bi bi-box-arrow-right me-1"></i> Keluar
-            </button>
-        </div>
+            <li>
+                <a href="{{ route('student.applications') }}"
+                    class="nav-link {{ request()->routeIs('student.applications') ? 'active' : '' }}">
+                    <i class="bi bi-clipboard-check me-2"></i> Lamaran Saya
+                </a>
+            </li>
+
+            {{-- ✅ Tampilkan hanya jika user punya application dengan status "active" --}}
+            @php
+                $hasActiveApplication = auth()
+                    ->user()
+                    ->applications()
+                    ->where('status', 'active')
+                    ->exists();
+            @endphp
+
+            @if ($hasActiveApplication)
+                <li>
+                    <a href="{{ route('student.journal') }}"
+                        class="nav-link {{ request()->routeIs('student.journal') ? 'active' : '' }}">
+                        <i class="bi bi-journal-text me-2"></i> Jurnal Magang
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('student.evaluation') }}"
+                        class="nav-link {{ request()->routeIs('student.evaluation') ? 'active' : '' }}">
+                        <i class="bi bi-award me-2"></i> Evaluasi
+                    </a>
+                </li>
+            @endif
+
+            <li>
+                <a href="{{ route('profile') }}"
+                    class="nav-link {{ request()->routeIs('profile') ? 'active' : '' }}">
+                    <i class="bi bi-person-lines-fill me-2"></i> Profil
+                </a>
+            </li>
+        </ul>
     </div>
+
+    <div>
+        <hr class="text-white-50">
+        <button type="button" class="btn btn-outline-light w-100" data-bs-toggle="modal"
+            data-bs-target="#logoutModal">
+            <i class="bi bi-box-arrow-right me-1"></i> Keluar
+        </button>
+    </div>
+</div>
+
 
     <!-- Main Content -->
     <div class="content">
@@ -102,7 +137,26 @@
                 </div>
             </div>
         </nav>
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 
+    <script>
+        // Tunggu 3 detik lalu sembunyikan alert
+        setTimeout(() => {
+            const alert = document.getElementById('success-alert');
+            if (alert) {
+                // Tambahkan animasi fade out
+                alert.classList.remove('show');
+                alert.classList.add('fade');
+                // Hapus elemen dari DOM setelah 500ms (animasi Bootstrap)
+                setTimeout(() => alert.remove(), 500);
+            }
+        }, 3000);
+    </script>
+@endif
         <!-- Filter Section -->
         <div class="card p-4 mb-4">
             <h5 class="mb-3"><i class="bi bi-funnel me-2 text-primary"></i> Lowongan Magang Tersedia</h5>
@@ -207,115 +261,120 @@
                     </div>
 
                     <!-- Application Form Modal -->
-                    <div class="modal fade" id="applyModal{{ $position->id }}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-lg modal-dialog-centered">
-                            <div class="modal-content border-0 shadow">
-                                <div class="modal-header bg-success text-white">
-                                    <h5 class="modal-title">
-                                        <i class="bi bi-send me-2"></i>Ajukan permohonan untuk {{ $position->title }}
-                                    </h5>
-                                    <button type="button" class="btn-close btn-close-white"
-                                        data-bs-dismiss="modal"></button>
-                                </div>
+<div class="modal fade" id="applyModal{{ $position->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-send me-2"></i>Ajukan permohonan untuk {{ $position->title }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
 
-                                <form action="{{ route('student.applications.store') }}" method="POST"
-                                    enctype="multipart/form-data">
-                                    @csrf
-                                    <input type="hidden" name="position_id" value="{{ $position->id }}">
+            <form action="{{ route('student.applications.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="position_id" value="{{ $position->id }}">
 
-                                    <div class="modal-body">
-                                        <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Email Aktif</label>
-                                                <input type="email" name="active_email" class="form-control"
-                                                    value="{{ old('active_email', Auth::user()->email) }}"
-                                                    placeholder="Enter your active email" required>
-                                                <div class="form-text text-muted">
-                                                    Anda dapat mengubah ini jika Anda lebih memilih alamat email aktif yang
-                                                    berbeda.
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Nomor WhatsApp</label>
-                                                <input type="text" name="whatsapp_number" class="form-control"
-                                                    value="{{ old('whatsapp_number', Auth::user()->phone ?? '') }}"
-                                                    placeholder="e.g. 08123456789" required>
-                                                <div class="form-text text-muted">
-                                                    Anda dapat memperbarui nomor WhatsApp Anda jika berbeda dengan yang
-                                                    tertera di profil Anda.
-                                                </div>
-                                            </div>
-
-
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Durasi Magang</label>
-                                                <select name="duration" class="form-select" required>
-                                                    <option value="">Pilih Durasi</option>
-                                                    <option value="1 Month">1 Bulan</option>
-                                                    <option value="3 Months">3 Bulan</option>
-                                                    <option value="6 Months">6 Bulan</option>
-                                                    <option value="8 Months">8 Bulan</option>
-                                                    <option value="12 Months">12 Bulan</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="col-12">
-                                                <label class="form-label fw-semibold">Motivasi</label>
-                                                <textarea name="motivation" class="form-control" rows="3"
-                                                    placeholder="Why do you want to join this internship?"
-                                                    required></textarea>
-                                            </div>
-
-                                            <hr class="my-3">
-
-                                            <h6 class="fw-bold">
-                                                <i class="bi bi-file-earmark-arrow-up me-2 text-success"></i>Unggah Dokumen
-                                            </h6>
-                                            <p class="small text-muted">
-                                                Format yang diterima: PDF, ukuran maksimum 2MB per file.
-                                            </p>
-
-                                            <div class="row g-3">
-                                                <div class="col-md-6">
-                                                    <label class="form-label fw-semibold">Curriculum Vitae (CV)</label>
-                                                    <input type="file" name="documents[cv]" class="form-control file-input"
-                                                        accept=".pdf" required>
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <label class="form-label fw-semibold">Surat Rekomendasi</label>
-                                                    <input type="file" name="documents[recommendation]"
-                                                        class="form-control file-input" accept=".pdf">
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <label class="form-label fw-semibold">Portofolio (opsional)</label>
-                                                    <input type="file" name="documents[portfolio]"
-                                                        class="form-control file-input" accept=".pdf">
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <label class="form-label fw-semibold">Transkrip (opsional)</label>
-                                                    <input type="file" name="documents[transcript]"
-                                                        class="form-control file-input" accept=".pdf">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                            <i class="bi bi-x-circle me-1"></i> Batal
-                                        </button>
-                                        <button type="submit" class="btn btn-success">
-                                            <i class="bi bi-check-circle me-1"></i> Kirimkan Permohonan
-                                        </button>
-                                    </div>
-                                </form>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Email Aktif
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="email" name="active_email" class="form-control"
+                                value="{{ old('active_email', Auth::user()->email) }}"
+                                placeholder="Masukkan email aktif Anda" required>
+                            <div class="form-text" style="font-size: 0.8rem; color: #6c757d;">
+                                ⚠️ Anda dapat mengubah ini jika Anda lebih memilih alamat email aktif yang berbeda.
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Nomor WhatsApp
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" name="whatsapp_number" class="form-control"
+                                value="{{ old('whatsapp_number', Auth::user()->phone ?? '') }}"
+                                placeholder="Contoh: 08123456789" required>
+                            <div class="form-text" style="font-size: 0.8rem; color: #6c757d;">
+                                ⚠️ Anda dapat memperbarui nomor WhatsApp Anda jika berbeda dengan yang tertera di profil Anda.
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Durasi Magang
+                                <span class="text-danger">*</span>
+                            </label>
+                            <select name="duration" class="form-select" required>
+                                <option value="">Pilih Durasi</option>
+                                <option value="1 Month">1 Bulan</option>
+                                <option value="3 Months">3 Bulan</option>
+                                <option value="6 Months">6 Bulan</option>
+                                <option value="8 Months">8 Bulan</option>
+                                <option value="12 Months">12 Bulan</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Motivasi
+                                <span class="text-danger">*</span>
+                            </label>
+                            <textarea name="motivation" class="form-control" rows="3"
+                                placeholder="Mengapa kamu tertarik untuk magang di sini?" required></textarea>
+                        </div>
+
+                        <hr class="my-3">
+
+                        <h6 class="fw-bold">
+                            <i class="bi bi-file-earmark-arrow-up me-2 text-success"></i>Unggah Dokumen
+                        </h6>
+                        <p class="small text-muted">
+                            Format yang diterima: PDF, ukuran maksimum 2MB per file.
+                        </p>
+
+                        <div class="row g-4">
+                            @php
+                                $docs = [
+                                    'cv' => 'Curriculum Vitae (CV)',
+                                    'recommendation' => 'Surat Rekomendasi',
+                                    'portfolio' => 'Portofolio',
+                                    'transcript' => 'Transkrip',
+                                ];
+                            @endphp
+
+                            @foreach ($docs as $key => $label)
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{{ $label }}
+                                        @if (in_array($key, ['cv', 'recommendation']))
+                                            <span class="text-danger">*</span>
+                                        @endif
+                                    </label>
+                                    <input type="file" name="documents[{{ $key }}]" class="form-control file-input"
+                                        accept=".pdf" @if (in_array($key, ['cv', 'recommendation'])) required @endif>
+
+                                    <!-- Tempat preview file PDF -->
+                                    <div class="mt-2 pdf-preview border rounded p-2 text-center" style="display:none;">
+                                        <canvas class="pdf-canvas" style="width:100%; max-height:250px; object-fit:contain;"></canvas>
+                                        <div class="small text-muted mt-1 file-name"></div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i> Batal
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle me-1"></i> Kirimkan Permohonan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
                 @endforeach
 
@@ -365,6 +424,70 @@
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: "{{ session('success') }}",
+                showConfirmButton: false,
+                timer: 1800
+            });
+        @endif
+    </script>
+<!-- ✅ Tambahkan library PDF.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+<!-- ✅ Script Preview PDF -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const fileInputs = document.querySelectorAll(".file-input");
+
+        fileInputs.forEach(input => {
+            input.addEventListener("change", async function (e) {
+                const file = e.target.files[0];
+                const previewContainer = input.closest(".col-md-6").querySelector(".pdf-preview");
+                const canvas = previewContainer.querySelector(".pdf-canvas");
+                const fileNameDisplay = previewContainer.querySelector(".file-name");
+
+                if (file && file.type === "application/pdf") {
+                    previewContainer.style.display = "block";
+                    fileNameDisplay.textContent = `📄 ${file.name}`;
+
+                    // Buat URL sementara untuk file PDF
+                    const fileURL = URL.createObjectURL(file);
+                    const loadingTask = pdfjsLib.getDocument(fileURL);
+
+                    try {
+                        const pdf = await loadingTask.promise;
+                        const page = await pdf.getPage(1);
+                        const viewport = page.getViewport({ scale: 1.0 });
+
+                        // Render setengah halaman (atas)
+                        const canvasContext = canvas.getContext("2d");
+                        const scale = canvas.width / viewport.width || 0.8;
+                        const renderViewport = page.getViewport({ scale });
+
+                        canvas.height = renderViewport.height / 2; // setengah halaman
+                        const renderContext = {
+                            canvasContext: canvasContext,
+                            viewport: renderViewport,
+                            transform: [1, 0, 0, 0.5, 0, 0], // render separuh tinggi
+                        };
+                        await page.render(renderContext).promise;
+                    } catch (err) {
+                        fileNameDisplay.textContent = "⚠️ Gagal menampilkan preview PDF.";
+                        console.error(err);
+                    }
+                } else {
+                    previewContainer.style.display = "none";
+                    canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+                }
+            });
+        });
+    });
+</script>
 </body>
 
 </html>

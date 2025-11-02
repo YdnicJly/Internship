@@ -69,11 +69,30 @@
             Beranda</a></li>
         <li><a href="{{ route('student.applications') }}" class="nav-link active"><i
               class="bi bi-clipboard-check me-2"></i> Lamaran Saya</a></li>
-        <li><a href="{{ route('student.journal') }}" class="nav-link"><i class="bi bi-journal-text me-2"></i>
-            Jurnal Magang
-          </a></li>
-        <li><a href="{{ route('student.evaluation') }}" class="nav-link"><i class="bi bi-award me-2"></i>
-            Evaluasi</a></li>
+         {{-- ✅ Tampilkan hanya jika user punya application dengan status "active" --}}
+            @php
+                $hasActiveApplication = auth()
+                    ->user()
+                    ->applications()
+                    ->where('status', 'active')
+                    ->exists();
+            @endphp
+
+            @if ($hasActiveApplication)
+                <li>
+                    <a href="{{ route('student.journal') }}"
+                        class="nav-link {{ request()->routeIs('student.journal') ? 'active' : '' }}">
+                        <i class="bi bi-journal-text me-2"></i> Jurnal Magang
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('student.evaluation') }}"
+                        class="nav-link {{ request()->routeIs('student.evaluation') ? 'active' : '' }}">
+                        <i class="bi bi-award me-2"></i> Evaluasi
+                    </a>
+                </li>
+            @endif
         <li><a href="{{ route('profile') }}" class="nav-link"><i class="bi bi-person-lines-fill me-2"></i>
             Profil</a></li>
       </ul>
@@ -103,7 +122,26 @@
         </div>
       </div>
     </nav>
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 
+    <script>
+        // Tunggu 3 detik lalu sembunyikan alert
+        setTimeout(() => {
+            const alert = document.getElementById('success-alert');
+            if (alert) {
+                // Tambahkan animasi fade out
+                alert.classList.remove('show');
+                alert.classList.add('fade');
+                // Hapus elemen dari DOM setelah 500ms (animasi Bootstrap)
+                setTimeout(() => alert.remove(), 500);
+            }
+        }, 3000);
+    </script>
+@endif
     <!-- Applications Table -->
     <div class="card p-4 mb-5">
       <h5 class="mb-3"><i class="bi bi-list-check me-2 text-success"></i>Status Lamaran</h5>
@@ -183,7 +221,7 @@
                         @foreach ($app->documents as $doc)
                           <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span class="text-capitalize">{{ $doc->type }}</span>
-                            <a href="{{ asset('storage/' . $doc->path) }}" target="_blank"
+                            <a href="{{ asset($doc->path) }}" target="_blank"
                               class="btn btn-sm btn-outline-secondary">
                               <i class="bi bi-box-arrow-up-right"></i> Buka
                             </a>
@@ -284,6 +322,28 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+document.addEventListener("DOMContentLoaded", function() {
+    @if (session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: "{{ session('success') }}",
+            showConfirmButton: false,
+            timer: 1800
+        });
+    @elseif (session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: "{{ session('error') }}",
+            showConfirmButton: true
+        });
+    @endif
+});
+</script>
 </body>
 
 </html>

@@ -14,33 +14,49 @@ class StudentProfileController extends Controller
         return view('student.profile');
     }
 
-    public function update(Request $request)
-    {
-        $user = Auth::user();
+public function update(Request $request)
+{
+    $user = Auth::user();
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'school_name' => 'required|string|max:255',
-            'major' => 'required|string|max:255',
-            'education_level' => 'required|string|max:50',
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:255',
-            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'school_name' => 'required|string|max:255',
+        'major' => 'required|string|max:255',
+        'education_level' => 'required|string|max:50',
+        'phone' => 'nullable|string|max:20',
+        'address' => 'nullable|string|max:255',
+        'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
 
-        // Hapus foto lama jika diupdate
-        if ($request->hasFile('profile_photo')) {
-            if ($user->profile_photo) {
-                Storage::disk('public')->delete($user->profile_photo);
-            }
-            $validated['profile_photo'] = $request->file('profile_photo')->store('profiles', 'public');
+    // 🔹 Path tujuan ke dalam public_html/profiles
+    $destinationPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/profiles';
+
+    // Buat folder kalau belum ada
+    if (!file_exists($destinationPath)) {
+        mkdir($destinationPath, 0755, true);
+    }
+
+    // 🔹 Hapus foto lama & upload baru
+    if ($request->hasFile('profile_photo')) {
+        // Hapus file lama (kalau ada)
+        if ($user->profile_photo && file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $user->profile_photo)) {
+            unlink($_SERVER['DOCUMENT_ROOT'] . '/' . $user->profile_photo);
         }
 
-        $user->update($validated);
+        // Simpan file baru
+        $filename = time() . '_' . uniqid() . '.' . $request->file('profile_photo')->getClientOriginalExtension();
+        $request->file('profile_photo')->move($destinationPath, $filename);
 
-        return back()->with('success', 'Profil berhasil diperbarui!');
+        // Simpan path relatif untuk akses via URL (misal: profiles/nama_file.jpg)
+        $validated['profile_photo'] = 'profiles/' . $filename;
     }
+
+    $user->update($validated);
+
+    return back()->with('success', 'Profil berhasil diperbarui!');
+}
+
 
     /**
      * 🔐 Fitur ubah password

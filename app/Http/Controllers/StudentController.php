@@ -11,36 +11,40 @@ use Illuminate\Support\Facades\Auth; // ✅ add this line
 
 class StudentController extends Controller
 {
-    public function index(Request $request)
-    {
-        // Basic query: show only open positions
-        $query = Position::where('status', 'open');
+public function index(Request $request)
+{
+    // Query dasar: hanya posisi yang statusnya open
+    $query = Position::where('status', 'open');
 
-        // Optional filtering logic
-        if ($request->filled('department') && $request->department !== 'All Departments') {
-            $query->where('department', $request->department);
-        }
-
-        if ($request->filled('title') && $request->title !== 'All Position') {
-            $query->where('title', $request->title);
-        }
-
-        if ($request->filled('keyword')) {
-            $keyword = $request->keyword;
-            $query->where(function ($q) use ($keyword) {
-                $q->where('title', 'like', "%{$keyword}%")
-                    ->orWhere('department', 'like', "%{$keyword}%")
-                    ->orWhere('description', 'like', "%{$keyword}%");
-            });
-        }
-
-        $positions = $query->orderBy('deadline', 'asc')->get();
-
-        return view('student.dashboard', [
-            'positions' => $positions,
-            'user' => Auth::user(),
-        ]);
+    // Filter Departemen
+    if ($request->filled('department') && $request->department !== 'Semua Departemen') {
+        $query->where('department', $request->department);
     }
+
+    // Filter Posisi
+    if ($request->filled('title') && $request->title !== 'Semua Posisi') {
+        $query->where('title', $request->title);
+    }
+
+    // Filter berdasarkan kata kunci (judul, departemen, atau deskripsi)
+    if ($request->filled('keyword')) {
+        $keyword = $request->keyword;
+        $query->where(function ($q) use ($keyword) {
+            $q->where('title', 'like', "%{$keyword}%")
+              ->orWhere('department', 'like', "%{$keyword}%")
+              ->orWhere('description', 'like', "%{$keyword}%");
+        });
+    }
+
+    // Urutkan berdasarkan deadline
+    $positions = $query->orderBy('deadline', 'asc')->get();
+
+    return view('student.dashboard', [
+        'positions' => $positions,
+        'user' => Auth::user(),
+    ]);
+}
+
 
     public function applications()
     {
@@ -72,6 +76,6 @@ class StudentController extends Controller
             ]
         );
 
-        return back()->with('success', 'Final report uploaded successfully.');
+        return back()->with('success', 'Laporan Akhir Berhasil diunggah.');
     }
 }

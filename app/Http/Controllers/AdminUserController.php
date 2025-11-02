@@ -31,7 +31,7 @@ class AdminUserController extends Controller
             'role' => $request->role,
         ]);
 
-        return redirect()->back()->with('success', 'User created successfully!');
+        return redirect()->back()->with('success', 'Data Pengguna Berhasil dibuat!');
     }
 
     public function update(Request $request, $id)
@@ -57,7 +57,7 @@ class AdminUserController extends Controller
 
         $user->save();
 
-        return redirect()->back()->with('success', 'User updated successfully!');
+        return redirect()->back()->with('success', 'Data Pengguna Berhasil diperbarui!');
     }
 
 
@@ -66,6 +66,6 @@ class AdminUserController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect()->back()->with('success', 'User deleted successfully!');
+        return redirect()->back()->with('success', 'Data Pengguna Berhasil dihapus!');
     }
 }

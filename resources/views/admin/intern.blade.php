@@ -107,7 +107,26 @@
         </div>
       </div>
     </nav>
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 
+    <script>
+        // Tunggu 3 detik lalu sembunyikan alert
+        setTimeout(() => {
+            const alert = document.getElementById('success-alert');
+            if (alert) {
+                // Tambahkan animasi fade out
+                alert.classList.remove('show');
+                alert.classList.add('fade');
+                // Hapus elemen dari DOM setelah 500ms (animasi Bootstrap)
+                setTimeout(() => alert.remove(), 500);
+            }
+        }, 3000);
+    </script>
+@endif
     <!-- ACTIVE INTERNS -->
     <div class="card p-4">
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -197,23 +216,30 @@
 
           {{-- 🔹 Form Penilaian --}}
           <div class="row g-3 mb-4">
-            @foreach ([
-              'discipline' => 'Kedisiplinan',
-              'teamwork' => 'Kerja Sama Tim',
-              'communication' => 'Komunikasi',
-              'skill' => 'Keahlian',
-              'responsibility' => 'Tanggung Jawab'
-            ] as $key => $label)
-              <div class="col-md-6">
-                <label class="form-label">{{ $label }}</label>
-                <input type="number" name="{{ $key }}" class="form-control" min="0" max="100" required>
-              </div>
-            @endforeach
+           @php
+    $evaluation = $intern->evaluations->first();
+@endphp
 
-            <div class="col-12">
-              <label class="form-label">Catatan</label>
-              <textarea name="notes" class="form-control" rows="3"></textarea>
-            </div>
+@foreach ([
+    'discipline' => 'Kedisiplinan',
+    'teamwork' => 'Kerja Sama Tim',
+    'communication' => 'Komunikasi',
+    'skill' => 'Keahlian',
+    'responsibility' => 'Tanggung Jawab'
+] as $key => $label)
+    <div class="col-md-6">
+        <label class="form-label">{{ $label }}</label>
+        <input type="number" name="{{ $key }}" class="form-control"
+            min="0" max="100" required
+            value="{{ old($key, $evaluation->$key ?? '') }}">
+    </div>
+@endforeach
+
+<div class="col-12">
+    <label class="form-label">Catatan</label>
+    <textarea name="notes" class="form-control" rows="3">{{ old('notes', $evaluation->notes ?? '') }}</textarea>
+</div>
+
           </div>
 
           <hr class="my-3">
@@ -226,9 +252,9 @@
 
           @if ($finalReport && $finalReport->file_path)
             <div class="ratio ratio-16x9 border rounded mb-3">
-              <iframe src="{{ asset('storage/' . $finalReport->file_path) }}" class="rounded"></iframe>
+              <iframe src="{{ asset($finalReport->file_path) }}" class="rounded"></iframe>
             </div>
-            <a href="{{ asset('storage/' . $finalReport->file_path) }}" target="_blank"
+            <a href="{{ asset($finalReport->file_path) }}" target="_blank"
                class="btn btn-outline-info btn-sm">
               <i class="bi bi-box-arrow-up-right me-1"></i> Buka Laporan di Tab Baru
             </a>
@@ -428,9 +454,9 @@
                     @endphp
                     @if ($finalReport && $finalReport->file_path)
                       <div class="ratio ratio-16x9 border rounded mb-3">
-                        <iframe src="{{ asset('storage/' . $finalReport->file_path) }}" class="rounded"></iframe>
+                        <iframe src="{{ asset($finalReport->file_path) }}" class="rounded"></iframe>
                       </div>
-                      <a href="{{ asset('storage/' . $finalReport->file_path) }}" target="_blank"
+                      <a href="{{ asset($finalReport->file_path) }}" target="_blank"
                         class="btn btn-outline-info btn-sm">
                         <i class="bi bi-box-arrow-up-right me-1"></i> Buka di Tab Baru
                       </a>
@@ -457,7 +483,7 @@
                   </div>
                   <div class="modal-body text-center">
                     @if ($certificate)
-                      <a href="{{ asset('storage/' . $certificate->file_path) }}" target="_blank"
+                      <a href="{{ asset($certificate->file_path) }}" target="_blank"
                         class="btn btn-outline-warning">
                         <i class="bi bi-file-earmark-pdf me-1"></i> Lihat Sertifikat
                       </a>
@@ -509,6 +535,7 @@
   <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
   <script>
     $(document).ready(function () {
+      $.fn.dataTable.ext.errMode = 'none';
       $('#internsTable, #completedInternsTable').DataTable({
         paging: true,
         searching: true,
@@ -527,6 +554,7 @@
       });
     });
   </script>
+  
 </body>
 
 </html>
