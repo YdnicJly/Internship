@@ -14,15 +14,15 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UsersSeeder::class,
             PositionsSeeder::class,
-            ApplicationsSeeder::class,
-            DocumentsSeeder::class,
-            SelectionsSeeder::class,
-            InterviewsSeeder::class,
-            JournalsSeeder::class,
-            FinalReportsSeeder::class,
-            EvaluationsSeeder::class,
-            CertificatesSeeder::class,
-            NotificationsSeeder::class,
+            // ApplicationsSeeder::class,
+            // DocumentsSeeder::class,
+            // SelectionsSeeder::class,
+            // InterviewsSeeder::class,
+            // JournalsSeeder::class,
+            // FinalReportsSeeder::class,
+            // EvaluationsSeeder::class,
+            // CertificatesSeeder::class,
+            // NotificationsSeeder::class,
         ]);
     }
 }

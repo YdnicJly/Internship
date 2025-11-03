@@ -25,6 +25,8 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      transition: transform 0.3s ease-in-out;
+      z-index: 1050;
     }
 
     .sidebar .nav-link {
@@ -42,6 +44,7 @@
     .content {
       margin-left: 250px;
       padding: 2rem;
+      transition: margin-left 0.3s ease-in-out;
     }
 
     .card {
@@ -54,32 +57,164 @@
       background: white;
       border-bottom: 1px solid #dee2e6;
     }
+
+    /* Hamburger Button */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1051;
+      background-color: #0d6efd;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .menu-toggle:hover {
+      background-color: #0b5ed7;
+    }
+
+    /* Overlay */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1040;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay.show {
+        display: block;
+      }
+
+      .content {
+        margin-left: 0;
+        padding: 1rem;
+        padding-top: 4rem;
+      }
+
+      .menu-toggle {
+        display: block;
+        right: 1rem;
+        top: 1rem;
+      }
+
+      .navbar .navbar-brand {
+        font-size: 0.9rem;
+      }
+
+      .navbar .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.5rem;
+      }
+
+      .navbar .d-flex span {
+        font-size: 0.8rem;
+      }
+
+      .navbar .d-flex img {
+        width: 35px;
+        height: 35px;
+      }
+
+      .card {
+        margin-bottom: 1rem;
+      }
+
+      .col-md-4,
+      .col-md-6 {
+        margin-bottom: 1rem;
+      }
+
+      .modal-lg {
+        max-width: 95%;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .content {
+        padding: 0.5rem;
+        padding-top: 4rem;
+      }
+
+      .navbar .navbar-brand {
+        font-size: 0.8rem;
+      }
+
+      .card {
+        padding: 1rem !important;
+      }
+
+      h5 {
+        font-size: 1rem;
+      }
+
+      .btn {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+      }
+    }
   </style>
 </head>
 
 <body>
+  <!-- Hamburger Button -->
+  <button class="menu-toggle" id="menuToggle">
+    <i class="bi bi-list fs-4"></i>
+  </button>
+
+  <!-- Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
   <!-- Sidebar -->
-  <div class="sidebar p-3">
+  <div class="sidebar p-3" id="sidebar">
     <div>
       <h5 class="fw-bold mb-4 d-flex align-items-center">
-        <i class="bi bi-building me-2"></i>SIMMAGANG
+        <i class="bi bi-building me-2"></i> SIMMAGANG
       </h5>
       <ul class="nav flex-column gap-1">
-        <li><a href="{{ route('admin.dashboard') }}" class="nav-link active"><i class="bi bi-speedometer2 me-2"></i>
-            Beranda</a></li>
-        <li><a href="{{ route('admin.positions') }}" class="nav-link"><i class="bi bi-briefcase me-2"></i> Lowongan
-            Magang
+        <li><a href="{{ route('admin.dashboard') }}"
+            class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+            <i class="bi bi-speedometer2 me-2"></i> Beranda
           </a></li>
-        <li><a href="{{ route('admin.applicants') }}" class="nav-link"><i class="bi bi-people me-2"></i> Data Pendaftar
+        <li><a href="{{ route('admin.positions') }}"
+            class="nav-link {{ request()->routeIs('admin.positions') ? 'active' : '' }}">
+            <i class="bi bi-briefcase me-2"></i> Lowongan Magang
           </a></li>
-        <li><a href="{{ route('admin.interviews') }}" class="nav-link "><i class="bi bi-calendar-event me-2"></i>
-            Jadwal Wawancara
+        <li><a href="{{ route('admin.applicants') }}"
+            class="nav-link {{ request()->routeIs('admin.applicants') ? 'active' : '' }}">
+            <i class="bi bi-people me-2"></i> Data Pendaftar
           </a></li>
-        <li><a href="{{ route('admin.intern') }}" class="nav-link "><i class="bi bi-journal-check me-2"></i>
-            Data Pemagang
+        <li><a href="{{ route('admin.interviews') }}"
+            class="nav-link {{ request()->routeIs('admin.interviews') ? 'active' : '' }}">
+            <i class="bi bi-calendar-event me-2"></i> Jadwal Wawancara
           </a></li>
-        <li><a href="{{ route('admin.user') }}" class="nav-link "><i
-              class="bi bi-person-gear me-2"></i> Manajemen Pengguna</a></li>
+        <li><a href="{{ route('admin.intern') }}"
+            class="nav-link {{ request()->routeIs('admin.intern') ? 'active' : '' }}">
+            <i class="bi bi-journal-check me-2"></i> Data Pemagang
+          </a></li>
+        <li><a href="{{ route('admin.user') }}"
+            class="nav-link {{ request()->routeIs('admin.user') ? 'active' : '' }}">
+            <i class="bi bi-person-gear me-2"></i> Manajemen Pengguna
+          </a></li>
       </ul>
     </div>
 
@@ -93,18 +228,20 @@
 
   <!-- Main Content -->
   <div class="content">
-    <!-- Top Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4 rounded shadow-sm">
-      <div class="container-fluid">
-        <span class="navbar-brand mb-0 h5">Beranda Admin</span>
-        <div class="d-flex align-items-center">
-          <span class="me-3 text-muted small">Selamat datang, {{ Auth::user()->name ?? 'Admin' }}</span>
-          <img
-            src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'A') }}&background=0d6efd&color=fff"
-            class="rounded-circle" width="40" height="40" alt="Foto Admin">
-        </div>
+  <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4 rounded shadow-sm p-3">
+    <div class="container-fluid flex-wrap justify-content-between gap-2">
+      <span class="navbar-brand mb-0 h5">Beranda</span>
+      <div class="d-flex align-items-center gap-2">
+        <span class="text-muted small d-none d-sm-inline">{{ Auth::user()->name ?? 'Admin' }}</span>
+        <img
+          src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'A') }}&background=0d6efd&color=fff"
+          class="rounded-circle"
+          width="40"
+          height="40"
+          alt="Foto Admin">
       </div>
-    </nav>
+    </div>
+  </nav>
 
     <!-- Statistik Dashboard -->
     <div class="row g-4">
@@ -167,47 +304,88 @@
 
     <!-- Pendaftar Terbaru -->
     <div class="card mt-5 p-4">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0"><i class="bi bi-people me-2 text-primary"></i>Pendaftar Terbaru</h5>
-        <a href="{{ route('admin.applicants') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
-      </div>
-      <table class="table align-middle">
-        <thead class="table-light">
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h5 class="mb-0">
+      <i class="bi bi-people me-2 text-primary"></i>Pendaftar Terbaru
+    </h5>
+    <a href="{{ route('admin.applicants') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+  </div>
+
+  <!-- 🔹 Tambahkan wrapper ini agar tabel bisa di-scroll di layar kecil -->
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Nama</th>
+          <th>Asal Sekolah / Universitas</th>
+          <th>Posisi Magang</th>
+          <th>Status</th>
+          <th>Tanggal Daftar</th>
+        </tr>
+      </thead>
+      <tbody>
+        @forelse($recentApplicants as $application)
           <tr>
-            <th>Nama</th>
-            <th>Asal Sekolah / Universitas</th>
-            <th>Posisi Magang</th>
-            <th>Status</th>
-            <th>Tanggal Daftar</th>
+            <td>{{ $application->user->name }}</td>
+            <td>{{ $application->user->school_name ?? '-' }}</td>
+            <td>{{ $application->position->title ?? '-' }}</td>
+            <td>
+              @if($application->status == 'submitted')
+                <span class="badge bg-secondary">Dikirim</span>
+              @elseif($application->status == 'under_review')
+                <span class="badge bg-warning text-dark">Sedang Ditinjau</span>
+              @elseif($application->status == 'active')
+                <span class="badge bg-success">Aktif</span>
+              @else
+                <span class="badge bg-light text-muted">Tidak Diketahui</span>
+              @endif
+            </td>
+            <td>{{ $application->created_at->format('d M Y') }}</td>
           </tr>
-        </thead>
-        <tbody>
-          @forelse($recentApplicants as $application)
-            <tr>
-              <td>{{ $application->user->name }}</td>
-              <td>{{ $application->user->school_name ?? '-' }}</td>
-              <td>{{ $application->position->title ?? '-' }}</td>
-              <td>
-                @if($application->status == 'submitted')
-                  <span class="badge bg-secondary">Dikirim</span>
-                @elseif($application->status == 'under_review')
-                  <span class="badge bg-warning text-dark">Sedang Ditinjau</span>
-                @elseif($application->status == 'active')
-                  <span class="badge bg-success">Aktif</span>
-                @else
-                  <span class="badge bg-light text-muted">Tidak Diketahui</span>
-                @endif
-              </td>
-              <td>{{ $application->created_at->format('d M Y') }}</td>
-            </tr>
-          @empty
-            <tr>
-              <td colspan="5" class="text-center text-muted">Belum ada pendaftar baru.</td>
-            </tr>
-          @endforelse
-        </tbody>
-      </table>
-    </div>
+        @empty
+          <tr>
+            <td colspan="5" class="text-center text-muted">Belum ada pendaftar baru.</td>
+          </tr>
+        @endforelse
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Tambahkan ini di bawah style global-mu -->
+<style>
+  @media (max-width: 768px) {
+    .card h5 {
+      font-size: 1rem;
+    }
+
+    .table th,
+    .table td {
+      font-size: 0.875rem;
+      white-space: nowrap; /* Mencegah teks kepotong */
+    }
+
+    .table-responsive {
+      border-radius: 10px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .table th,
+    .table td {
+      font-size: 0.8rem;
+      padding: 0.4rem 0.6rem;
+    }
+
+    .btn {
+      font-size: 0.8rem;
+      padding: 0.3rem 0.6rem;
+    }
+  }
+</style>
+
   </div>
 
   <!-- Modal Logout -->
@@ -249,7 +427,21 @@
   });
 @endif
 </script>
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
 
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('show');
+      overlay.classList.toggle('show');
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('show');
+      overlay.classList.remove('show');
+    });
+  </script>
 </body>
 
 </html>

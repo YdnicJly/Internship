@@ -9,7 +9,6 @@
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
 
   <style>
     body {
@@ -26,6 +25,8 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      transition: transform 0.3s ease-in-out;
+      z-index: 1050;
     }
 
     .sidebar .nav-link {
@@ -43,6 +44,7 @@
     .content {
       margin-left: 250px;
       padding: 2rem;
+      transition: margin-left 0.3s ease-in-out;
     }
 
     .card {
@@ -56,43 +58,163 @@
       border-bottom: 1px solid #dee2e6;
     }
 
-    .badge-status {
-      text-transform: capitalize;
+    /* Hamburger Button */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1051;
+      background-color: #0d6efd;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
-    /* Rapi tombol aksi */
-    .action-buttons {
-      display: flex;
-      gap: 0.4rem;
-      justify-content: flex-end;
+    .menu-toggle:hover {
+      background-color: #0b5ed7;
     }
 
-    .action-buttons .btn {
-      min-width: 32px;
+    /* Overlay */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1040;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay.show {
+        display: block;
+      }
+
+      .content {
+        margin-left: 0;
+        padding: 1rem;
+        padding-top: 4rem;
+      }
+
+      .menu-toggle {
+        display: block;
+        right: 1rem;
+        top: 1rem;
+      }
+
+      .navbar .navbar-brand {
+        font-size: 0.9rem;
+      }
+
+      .navbar .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.5rem;
+      }
+
+      .navbar .d-flex span {
+        font-size: 0.8rem;
+      }
+
+      .navbar .d-flex img {
+        width: 35px;
+        height: 35px;
+      }
+
+      .card {
+        margin-bottom: 1rem;
+      }
+
+      .col-md-4,
+      .col-md-6 {
+        margin-bottom: 1rem;
+      }
+
+      .modal-lg {
+        max-width: 95%;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .content {
+        padding: 0.5rem;
+        padding-top: 4rem;
+      }
+
+      .navbar .navbar-brand {
+        font-size: 0.8rem;
+      }
+
+      .card {
+        padding: 1rem !important;
+      }
+
+      h5 {
+        font-size: 1rem;
+      }
+
+      .btn {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+      }
     }
   </style>
 </head>
 
 <body>
+  <!-- Hamburger Button -->
+  <button class="menu-toggle" id="menuToggle">
+    <i class="bi bi-list fs-4"></i>
+  </button>
+
+  <!-- Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
   <!-- Sidebar -->
-  <div class="sidebar p-3">
+  <div class="sidebar p-3" id="sidebar">
     <div>
       <h5 class="fw-bold mb-4 d-flex align-items-center">
-        <i class="bi bi-building me-2"></i>SIMMAGANG
+        <i class="bi bi-building me-2"></i> SIMMAGANG
       </h5>
       <ul class="nav flex-column gap-1">
-        <li><a href="{{ route('admin.dashboard') }}" class="nav-link"><i class="bi bi-speedometer2 me-2"></i>
-            Beranda</a></li>
-        <li><a href="{{ route('admin.positions') }}" class="nav-link"><i class="bi bi-briefcase me-2"></i> Lowongan
-            Magang</a></li>
-        <li><a href="{{ route('admin.applicants') }}" class="nav-link active"><i class="bi bi-people me-2"></i> Data
-            Pendaftar</a></li>
-        <li><a href="{{ route('admin.interviews') }}" class="nav-link"><i class="bi bi-calendar-event me-2"></i>
-            Jadwal Wawancara</a></li>
-        <li><a href="{{ route('admin.intern') }}" class="nav-link"><i class="bi bi-journal-check me-2"></i>
-            Data Pemagang</a></li>
-        <li><a href="{{ route('admin.user') }}" class="nav-link"><i class="bi bi-person-gear me-2"></i> Manajemen
-            Pengguna</a></li>
+        <li><a href="{{ route('admin.dashboard') }}"
+            class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+            <i class="bi bi-speedometer2 me-2"></i> Beranda
+          </a></li>
+        <li><a href="{{ route('admin.positions') }}"
+            class="nav-link {{ request()->routeIs('admin.positions') ? 'active' : '' }}">
+            <i class="bi bi-briefcase me-2"></i> Lowongan Magang
+          </a></li>
+        <li><a href="{{ route('admin.applicants') }}"
+            class="nav-link {{ request()->routeIs('admin.applicants') ? 'active' : '' }}">
+            <i class="bi bi-people me-2"></i> Data Pendaftar
+          </a></li>
+        <li><a href="{{ route('admin.interviews') }}"
+            class="nav-link {{ request()->routeIs('admin.interviews') ? 'active' : '' }}">
+            <i class="bi bi-calendar-event me-2"></i> Jadwal Wawancara
+          </a></li>
+        <li><a href="{{ route('admin.intern') }}"
+            class="nav-link {{ request()->routeIs('admin.intern') ? 'active' : '' }}">
+            <i class="bi bi-journal-check me-2"></i> Data Pemagang
+          </a></li>
+        <li><a href="{{ route('admin.user') }}"
+            class="nav-link {{ request()->routeIs('admin.user') ? 'active' : '' }}">
+            <i class="bi bi-person-gear me-2"></i> Manajemen Pengguna
+          </a></li>
       </ul>
     </div>
 
@@ -105,58 +227,62 @@
   </div>
 
   <!-- Main Content -->
-  <div class="content">
-    <!-- Top Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4 rounded shadow-sm">
-      <div class="container-fluid">
-        <span class="navbar-brand mb-0 h5">Manajemen Pendaftar</span>
-        <div class="d-flex align-items-center">
-          <span class="me-3 text-muted small">Selamat datang, {{ Auth::user()->name ?? 'Admin' }}</span>
-          <img
-            src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'A') }}&background=0d6efd&color=fff"
-            class="rounded-circle" width="40" height="40" alt="Admin Avatar">
-        </div>
+ <div class="content">
+  <!-- 🔹 Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4 rounded shadow-sm p-3">
+    <div class="container-fluid flex-wrap justify-content-between gap-2">
+      <span class="navbar-brand mb-0 h5">Data Pendaftar</span>
+      <div class="d-flex align-items-center gap-2">
+        <span class="text-muted small d-none d-sm-inline">{{ Auth::user()->name ?? 'Admin' }}</span>
+        <img
+          src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'A') }}&background=0d6efd&color=fff"
+          class="rounded-circle"
+          width="40"
+          height="40"
+          alt="Foto Admin">
       </div>
-    </nav>
-    @if (session('success'))
-      <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
+    </div>
+  </nav>
 
-      <script>
-        // Tunggu 3 detik lalu sembunyikan alert
-        setTimeout(() => {
-          const alert = document.getElementById('success-alert');
-          if (alert) {
-            // Tambahkan animasi fade out
-            alert.classList.remove('show');
-            alert.classList.add('fade');
-            // Hapus elemen dari DOM setelah 500ms (animasi Bootstrap)
-            setTimeout(() => alert.remove(), 500);
-          }
-        }, 3000);
-      </script>
-    @endif
-    <!-- Filter + Table -->
-    <div class="card p-4">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h5 class="mb-0"><i class="bi bi-list-task text-primary me-2"></i>Daftar Semua Pendaftar</h5>
-        <form method="GET" class="d-flex gap-2">
-          <select name="status" class="form-select" onchange="this.form.submit()">
-            <option value="">Semua Status</option>
-            <option value="submitted" {{ request('status') == 'submitted' ? 'selected' : '' }}>Dikirim</option>
-            <option value="under_review" {{ request('status') == 'under_review' ? 'selected' : '' }}>Sedang Ditinjau
-            </option>
-            <option value="interview" {{ request('status') == 'interview' ? 'selected' : '' }}>
-              Wawancara
-              Terjadwal</option>
-            <option value="accepted" {{ request('status') == 'accepted' ? 'selected' : '' }}>Diterima</option>
-            <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
-          </select>
-        </form>
-      </div>
+  <!-- 🔹 Alert sukses -->
+  @if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
+      {{ session('success') }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 
+    <script>
+      setTimeout(() => {
+        const alert = document.getElementById('success-alert');
+        if (alert) {
+          alert.classList.remove('show');
+          alert.classList.add('fade');
+          setTimeout(() => alert.remove(), 500);
+        }
+      }, 3000);
+    </script>
+  @endif
+
+  <!-- 🔹 Filter + Table -->
+  <div class="card p-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+      <h5 class="mb-0">
+        <i class="bi bi-list-task text-primary me-2"></i>Daftar Semua Pendaftar
+      </h5>
+      <form method="GET" class="d-flex flex-wrap gap-2">
+        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+          <option value="">Semua Status</option>
+          <option value="submitted" {{ request('status') == 'submitted' ? 'selected' : '' }}>Dikirim</option>
+          <option value="under_review" {{ request('status') == 'under_review' ? 'selected' : '' }}>Sedang Ditinjau</option>
+          <option value="interview" {{ request('status') == 'interview' ? 'selected' : '' }}>Wawancara Terjadwal</option>
+          <option value="accepted" {{ request('status') == 'accepted' ? 'selected' : '' }}>Diterima</option>
+          <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
+        </select>
+      </form>
+    </div>
+
+    <!-- 🔹 Table wrapper for responsiveness -->
+    <div class="table-responsive">
       <table id="applicantsTable" class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
@@ -189,36 +315,26 @@
                     'rejected' => ['label' => 'Ditolak', 'class' => 'danger'],
                     'completed' => ['label' => 'Selesai', 'class' => 'secondary'],
                   ];
-
                   $status = $statusMap[$app->status] ?? ['label' => ucfirst($app->status), 'class' => 'secondary'];
                 @endphp
-
-                <span class="badge bg-{{ $status['class'] }}">
-                  {{ $status['label'] }}
-                </span>
+                <span class="badge bg-{{ $status['class'] }}">{{ $status['label'] }}</span>
               </td>
-
               <td>{{ $app->selection->score ?? '-' }}</td>
               <td>{{ $app->created_at->format('Y-m-d') }}</td>
               <td class="text-end">
-                <div class="action-buttons">
-                  <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                    data-bs-target="#detailModal{{ $app->id }}">
+                <div class="d-flex justify-content-end gap-1 flex-wrap">
+                  <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#detailModal{{ $app->id }}">
                     <i class="bi bi-eye"></i>
                   </button>
-                  <button class="btn btn-sm btn-outline-warning" title="Edit" data-bs-toggle="modal"
-                    data-bs-target="#editAppModal{{ $app->id }}">
+                  <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editAppModal{{ $app->id }}">
                     <i class="bi bi-pencil"></i>
                   </button>
                   <form action="{{ route('admin.applicants.destroy', $app->id) }}" method="POST" class="d-inline">
-                    @csrf
-                    @method('DELETE')
-                    <button class="btn btn-sm btn-outline-danger" title="Hapus"
-                      onclick="return confirm('Yakin ingin menghapus pendaftar ini?')">
+                    @csrf @method('DELETE')
+                    <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Yakin ingin menghapus pendaftar ini?')">
                       <i class="bi bi-trash"></i>
                     </button>
                   </form>
-
                 </div>
               </td>
             </tr>
@@ -240,9 +356,17 @@
                         <span class="badge bg-success">Diterima</span>
                       @elseif ($app->status === 'rejected')
                         <span class="badge bg-danger">Ditolak</span>
+                      @elseif ($app->status === 'active')
+                        <span class="badge bg-success">Aktif Magang</span>
+                      @elseif ($app->status === 'completed')
+                        <span class="badge bg-secondary">Selesai Magang</span>
+                      @elseif ($app->status === 'interview')
+                        <span class="badge bg-info">Wawancara</span>
+                      @elseif ($app->status === 'submitted')
+                        <span class="badge bg-primary">Terkirim</span>
                       @else
                         <span class="badge bg-warning text-dark">Sedang Ditinjau</span>
-                      @endif
+                    @endif
                     </p>
 
                     <hr>
@@ -412,7 +536,7 @@
               </div>
             </div>
 
-          @empty
+     @empty
             <tr>
               <td colspan="9" class="text-center text-muted py-4">Tidak ada data pendaftar.</td>
             </tr>
@@ -421,6 +545,63 @@
       </table>
     </div>
   </div>
+</div>
+
+<!-- 🔹 Tambahkan CSS responsif -->
+<style>
+  @media (max-width: 992px) {
+    .navbar-brand {
+      font-size: 1.1rem;
+    }
+    .form-select {
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .table th, .table td {
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    .btn-sm {
+      padding: 0.25rem 0.4rem;
+      font-size: 0.8rem;
+    }
+
+    .navbar .text-muted {
+      display: none; /* sembunyikan nama jika layar kecil */
+    }
+  }
+
+  @media (max-width: 576px) {
+    .card h5 {
+      font-size: 1rem;
+    }
+
+    .table th, .table td {
+      font-size: 0.75rem;
+      padding: 0.4rem;
+    }
+
+    .table-responsive {
+      border-radius: 10px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
+  /* Modal responsif */
+  @media (max-width: 576px) {
+    .modal-dialog {
+      margin: 0.5rem;
+      max-width: 100%;
+    }
+    .modal-body {
+      font-size: 0.85rem;
+    }
+  }
+</style>
 
   <!-- Logout Modal -->
   <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
@@ -450,6 +631,7 @@
   <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
   <script>
     $(document).ready(function () {
+      $.fn.dataTable.ext.errMode = 'none';
       $('#applicantsTable').DataTable({
         paging: true,
         searching: true,
@@ -530,7 +712,21 @@
     });
   });
 </script>
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
 
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('show');
+      overlay.classList.toggle('show');
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('show');
+      overlay.classList.remove('show');
+    });
+  </script>
 </body>
 
 </html>

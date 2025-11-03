@@ -9,7 +9,7 @@ return new class extends Migration {
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('application_id')->constrained()->onDelete('cascade');
-            $table->string('type'); // contoh: CV, transkrip, surat_rekomendasi
+            $table->string('type'); // type: CV, transkrip, portofolio, surat_rekomendasi
             $table->string('path');
             $table->timestamps();
         });
