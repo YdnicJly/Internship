@@ -249,12 +249,30 @@
                                     <button class="btn btn-secondary" data-bs-dismiss="modal">
                                         <i class="bi bi-x-circle me-1"></i> Tutup
                                     </button>
-                                    @if ($position->status === 'open')
-                                        <button class="btn btn-primary" data-bs-target="#applyModal{{ $position->id }}"
-                                            data-bs-toggle="modal" data-bs-dismiss="modal">
-                                            <i class="bi bi-send me-1"></i> Daftar
-                                        </button>
-                                    @endif
+                                    @php
+    // 🔍 Cek apakah user sudah punya lamaran aktif
+    $hasActiveApplication = auth()->user()
+        ->applications()
+        ->where('status', 'active')
+        ->exists();
+@endphp
+
+@if ($position->status === 'open')
+    @if ($hasActiveApplication)
+        {{-- 🚫 Jika user punya lamaran aktif, tombol terkunci --}}
+        <button class="btn btn-secondary" disabled title="Anda sudah memiliki magang aktif">
+            <i class="bi bi-lock-fill me-1"></i>Terkunci
+        </button>
+    @else
+        {{-- ✅ Jika belum ada lamaran aktif, boleh daftar --}}
+        <button class="btn btn-primary"
+            data-bs-target="#applyModal{{ $position->id }}"
+            data-bs-toggle="modal"
+            data-bs-dismiss="modal">
+            <i class="bi bi-send me-1"></i> Daftar
+        </button>
+    @endif
+@endif
                                 </div>
                             </div>
                         </div>

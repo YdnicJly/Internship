@@ -252,31 +252,45 @@
           <div class="modal-body">
             <div class="row g-3">
               <div class="col-md-6">
-                <label class="form-label">Judul</label>
+                <label class="form-label">Judul
+                  <span class="text-danger">*</span>
+                </label>
                 <input type="text" name="title" class="form-control" required>
               </div>
               <div class="col-md-6">
-                <label class="form-label">Departemen</label>
+                <label class="form-label">Departemen
+                  <span class="text-danger">*</span>
+                </label>
                 <input type="text" name="department" class="form-control" required>
               </div>
               <div class="col-md-12">
-                <label class="form-label">Deskripsi</label>
+                <label class="form-label">Deskripsi
+                  <span class="text-danger">*</span>
+                </label>
                 <textarea name="description" class="form-control" rows="3"></textarea>
               </div>
               <div class="col-md-12">
-                <label class="form-label">Persyaratan</label>
+                <label class="form-label">Persyaratan
+                  <span class="text-danger">*</span>
+                </label>
                 <textarea name="requirements" class="form-control" rows="3"></textarea>
               </div>
               <div class="col-md-4">
-                <label class="form-label">Kuota</label>
+                <label class="form-label">Kuota
+                  <span class="text-danger">*</span>
+                </label>
                 <input type="number" name="quota" class="form-control" value="1">
               </div>
               <div class="col-md-4">
-                <label class="form-label">Batas Waktu</label>
+                <label class="form-label">Batas Waktu
+                  <span class="text-danger">*</span>
+                </label>
                 <input type="date" name="deadline" class="form-control">
               </div>
               <div class="col-md-4">
-                <label class="form-label">Status</label>
+                <label class="form-label">Status
+                  <span class="text-danger">*</span>
+                </label>
                 <select name="status" class="form-select">
                   <option value="open" selected>Dibuka</option>
                   <option value="closed">Ditutup</option>

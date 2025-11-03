@@ -201,51 +201,63 @@
                 </form>
               </td>
             </tr>
-            <!-- Modal Evaluasi + Final Report -->
+<!-- Modal Evaluasi + Final Report -->
 <div class="modal fade" id="evaluationModal{{ $intern->id }}" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content border-0 shadow">
       <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title"><i class="bi bi-clipboard2-check me-2"></i>Evaluasi Pemagang</h5>
+        <h5 class="modal-title">
+          <i class="bi bi-clipboard2-check me-2"></i>Evaluasi Pemagang
+        </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
 
-      <form action="{{ route('admin.intern.evaluation.store', $intern->id) }}" method="POST">
+      @php
+        $evaluation = $intern->evaluations->first();
+        $readonly = $evaluation ? 'readonly' : '';
+      @endphp
+
+      <form 
+        action="{{ $evaluation ? '#' : route('admin.intern.evaluation.store', $intern->id) }}" 
+        method="POST"
+      >
         @csrf
         <div class="modal-body">
 
           {{-- 🔹 Form Penilaian --}}
           <div class="row g-3 mb-4">
-           @php
-    $evaluation = $intern->evaluations->first();
-@endphp
 
-@foreach ([
-    'discipline' => 'Kedisiplinan',
-    'teamwork' => 'Kerja Sama Tim',
-    'communication' => 'Komunikasi',
-    'skill' => 'Keahlian',
-    'responsibility' => 'Tanggung Jawab'
-] as $key => $label)
-    <div class="col-md-6">
-        <label class="form-label">{{ $label }}</label>
-        <input type="number" name="{{ $key }}" class="form-control"
-            min="0" max="100" required
-            value="{{ old($key, $evaluation->$key ?? '') }}">
-    </div>
-@endforeach
+            @foreach ([
+                'discipline' => 'Kedisiplinan',
+                'teamwork' => 'Kerja Sama Tim',
+                'communication' => 'Komunikasi',
+                'skill' => 'Keahlian',
+                'responsibility' => 'Tanggung Jawab'
+            ] as $key => $label)
+              <div class="col-md-6">
+                <label class="form-label">{{ $label }}
+                  <span class="text-danger">*</span>
+                </label>
+                <input type="number" name="{{ $key }}" class="form-control"
+                  min="0" max="100" required {{ $readonly }}
+                  value="{{ old($key, $evaluation->$key ?? '') }}">
+              </div>
+            @endforeach
 
-<div class="col-12">
-    <label class="form-label">Catatan</label>
-    <textarea name="notes" class="form-control" rows="3">{{ old('notes', $evaluation->notes ?? '') }}</textarea>
-</div>
+            <div class="col-12">
+              <label class="form-label">Catatan <span class="text-danger">*</span></label>
+              <textarea name="notes" class="form-control" rows="3" {{ $readonly }}>{{ old('notes', $evaluation->notes ?? '') }}</textarea>
+            </div>
 
           </div>
 
           <hr class="my-3">
 
           {{-- 🔹 Bagian Laporan Akhir --}}
-          <h6 class="fw-bold mb-3 text-info"><i class="bi bi-journal-richtext me-2"></i>Laporan Akhir</h6>
+          <h6 class="fw-bold mb-3 text-info">
+            <i class="bi bi-journal-richtext me-2"></i>Laporan Akhir
+          </h6>
+
           @php
             $finalReport = $intern->finalReport ?? null;
           @endphp
@@ -265,38 +277,97 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-primary">Simpan Evaluasi</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+          @if (!$evaluation)
+            <button type="submit" class="btn btn-primary">Simpan Evaluasi</button>
+          @endif
         </div>
       </form>
     </div>
   </div>
 </div>
 
-
             <!-- Modal Sertifikat -->
-            <div class="modal fade" id="certificateModal{{ $intern->id }}" tabindex="-1" aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow">
-                  <div class="modal-header bg-warning">
-                    <h5 class="modal-title text-dark"><i class="bi bi-file-earmark-pdf me-2"></i>Upload Sertifikat</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                  </div>
-                  <form action="{{ route('admin.intern.certificate.store', $intern->id) }}" method="POST"
-                    enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-body">
-                      <label class="form-label">File Sertifikat (PDF)</label>
-                      <input type="file" name="certificate_file" class="form-control" accept="application/pdf" required>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                      <button type="submit" class="btn btn-warning text-dark">Upload</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
+<div class="modal fade" id="certificateModal{{ $intern->id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title text-dark">
+          <i class="bi bi-file-earmark-pdf me-2"></i>Sertifikat Pemagang
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      @php
+        $certificate = $intern->certificate ?? null;
+      @endphp
+
+      <form action="{{ route('admin.intern.certificate.store', $intern->id) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-body">
+          
+          {{-- 🔹 Preview jika sudah ada sertifikat --}}
+          @if ($certificate && $certificate->file_path)
+            <div class="ratio ratio-16x9 border rounded mb-3">
+              <iframe src="{{ asset($certificate->file_path) }}" class="rounded"></iframe>
             </div>
+
+            <a href="{{ asset($certificate->file_path) }}" target="_blank"
+               class="btn btn-outline-warning btn-sm text-dark mb-3">
+              <i class="bi bi-box-arrow-up-right me-1"></i> Buka Sertifikat di Tab Baru
+            </a>
+
+            <div class="alert alert-info py-2 mb-3">
+              <i class="bi bi-info-circle me-1"></i> Unggah file baru untuk mengganti sertifikat lama.
+            </div>
+          @else
+            <p class="text-muted mb-3">Belum ada sertifikat diunggah.</p>
+          @endif
+
+          {{-- 🔹 Input upload (berfungsi upload + update) --}}
+          <label class="form-label">File Sertifikat (PDF) <span class="text-danger">*</span></label>
+          <input type="file" name="certificate_file" id="certificateInput{{ $intern->id }}" 
+                 class="form-control" accept="application/pdf" required>
+
+          {{-- 📄 Preview PDF sebelum upload --}}
+          <div id="certificatePreview{{ $intern->id }}" class="mt-3" style="display:none;">
+            <div class="ratio ratio-16x9 border rounded">
+              <iframe id="certificateFrame{{ $intern->id }}" class="rounded"></iframe>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-warning text-dark">Upload Sertifikat</button>
+        </div>
+      </form>
+
+      {{-- 🔧 Script preview PDF --}}
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const input = document.getElementById('certificateInput{{ $intern->id }}');
+          const preview = document.getElementById('certificatePreview{{ $intern->id }}');
+          const frame = document.getElementById('certificateFrame{{ $intern->id }}');
+
+          input.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type === 'application/pdf') {
+              const fileURL = URL.createObjectURL(file);
+              frame.src = fileURL;
+              preview.style.display = 'block';
+            } else {
+              frame.src = '';
+              preview.style.display = 'none';
+            }
+          });
+        });
+      </script>
+    </div>
+  </div>
+</div>
+
 
             <!-- Modal Edit Status -->
             <div class="modal fade" id="editInternModal{{ $intern->id }}" tabindex="-1" aria-hidden="true">

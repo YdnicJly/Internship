@@ -101,7 +101,7 @@
     <div>
       <hr class="text-white-50">
       <button type="button" class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#logoutModal">
-        <i class="bi bi-box-arrow-right me-1"></i> Logout
+        <i class="bi bi-box-arrow-right me-1"></i> Keluar
       </button>
     </div>
 
@@ -166,6 +166,8 @@
                   <span class="badge bg-success">Diterima</span>
                 @elseif ($app->status === 'rejected')
                   <span class="badge bg-danger">Ditolak</span>
+                @elseif ($app->status === 'submitted')
+                  <span class="badge bg-primary">Terkirim</span>
                 @else
                   <span class="badge bg-warning text-dark">Sedang Ditinjau</span>
                 @endif
@@ -258,7 +260,7 @@
             <th>Tanggal</th>
             <th>Posisi</th>
             <th>Status</th>
-            <th>Hasil</th>
+            <th>Catatan</th>
           </tr>
         </thead>
         <tbody>

@@ -9,6 +9,7 @@ class Evaluation extends Model
 {
     use HasFactory;
 
+    // ✅ Masukkan semua kolom yang bisa diisi dari form
     protected $fillable = [
         'user_id',
         'discipline',

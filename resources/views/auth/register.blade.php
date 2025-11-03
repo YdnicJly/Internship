@@ -6,18 +6,49 @@
   <link rel="icon" type="image/png" href="{{ asset('images/logo.jpg') }}">
   <title>SIMMAGANG</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
 
-  <div class="container d-flex align-items-center justify-content-center vh-100">
-    <div class="card shadow-lg p-4" style="width: 500px;">
+  <style>
+    /* ✅ Responsiveness adjustments */
+    body {
+      background-color: #f8f9fa;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .card {
+      max-width: 500px;
+      width: 100%;
+      border-radius: 1rem;
+    }
+
+    @media (max-width: 576px) {
+      .card {
+        padding: 1.5rem !important;
+      }
+      h4 {
+        font-size: 1.25rem;
+      }
+      .form-label {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="card shadow-lg p-4 mx-auto">
       <h4 class="text-center mb-4">Pendaftaran Akun Magang</h4>
 
       <form method="POST" action="{{ route('register') }}">
         @csrf
 
-        <div class="row g-2">
-          <div class="col-md-6 mb-3">
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
             <label class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
             <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
                    value="{{ old('name') }}" required>
@@ -26,7 +57,7 @@
             @enderror
           </div>
 
-          <div class="col-md-6 mb-3">
+          <div class="col-12 col-md-6">
             <label class="form-label">Email <span class="text-danger">*</span></label>
             <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
                    value="{{ old('email') }}" required>
@@ -36,8 +67,8 @@
           </div>
         </div>
 
-        <div class="row g-2">
-          <div class="col-md-6 mb-3">
+        <div class="row g-3 mt-1">
+          <div class="col-12 col-md-6">
             <label class="form-label">Asal Sekolah / Universitas <span class="text-danger">*</span></label>
             <input type="text" name="school_name" class="form-control @error('school_name') is-invalid @enderror"
                    value="{{ old('school_name') }}" required>
@@ -46,7 +77,7 @@
             @enderror
           </div>
 
-          <div class="col-md-6 mb-3">
+          <div class="col-12 col-md-6">
             <label class="form-label">Jurusan <span class="text-danger">*</span></label>
             <input type="text" name="major" class="form-control @error('major') is-invalid @enderror"
                    value="{{ old('major') }}" required>
@@ -56,8 +87,8 @@
           </div>
         </div>
 
-        <div class="row g-2">
-          <div class="col-md-6 mb-3">
+        <div class="row g-3 mt-1">
+          <div class="col-12 col-md-6">
             <label class="form-label">Jenjang Pendidikan <span class="text-danger">*</span></label>
             <select name="education_level" class="form-select @error('education_level') is-invalid @enderror" required>
               <option value="">-- Pilih --</option>
@@ -69,7 +100,7 @@
             @enderror
           </div>
 
-          <div class="col-md-6 mb-3">
+          <div class="col-12 col-md-6">
             <label class="form-label">Nomor Telepon <span class="text-danger">*</span></label>
             <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror"
                    value="{{ old('phone') }}" required>
@@ -79,7 +110,7 @@
           </div>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-3 mt-1">
           <label class="form-label">Alamat <span class="text-danger">*</span></label>
           <textarea name="address" rows="2" class="form-control @error('address') is-invalid @enderror" required>{{ old('address') }}</textarea>
           @error('address')
@@ -87,8 +118,8 @@
           @enderror
         </div>
 
-        <div class="row g-2">
-          <div class="col-md-6 mb-3">
+        <div class="row g-3 mt-1">
+          <div class="col-12 col-md-6">
             <label class="form-label">Password <span class="text-danger">*</span></label>
             <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" required>
             @error('password')
@@ -96,16 +127,15 @@
             @enderror
           </div>
 
-          <div class="col-md-6 mb-3">
+          <div class="col-12 col-md-6">
             <label class="form-label">Konfirmasi Password <span class="text-danger">*</span></label>
             <input type="password" name="password_confirmation" class="form-control" required>
           </div>
         </div>
 
-        <button type="submit" class="btn btn-success w-100 mb-2">Daftar Sekarang</button>
+        <button type="submit" class="btn btn-success w-100 mt-3">Daftar Sekarang</button>
 
-        {{-- Back to landing --}}
-        <a href="{{ url('/') }}" class="btn btn-outline-secondary w-100">
+        <a href="{{ url('/') }}" class="btn btn-outline-secondary w-100 mt-2">
           ← Kembali ke Beranda
         </a>
       </form>

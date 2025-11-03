@@ -118,26 +118,26 @@
         </div>
       </div>
     </nav>
-@if (session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
+    @if (session('success'))
+      <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
         {{ session('success') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
+      </div>
 
-    <script>
+      <script>
         // Tunggu 3 detik lalu sembunyikan alert
         setTimeout(() => {
-            const alert = document.getElementById('success-alert');
-            if (alert) {
-                // Tambahkan animasi fade out
-                alert.classList.remove('show');
-                alert.classList.add('fade');
-                // Hapus elemen dari DOM setelah 500ms (animasi Bootstrap)
-                setTimeout(() => alert.remove(), 500);
-            }
+          const alert = document.getElementById('success-alert');
+          if (alert) {
+            // Tambahkan animasi fade out
+            alert.classList.remove('show');
+            alert.classList.add('fade');
+            // Hapus elemen dari DOM setelah 500ms (animasi Bootstrap)
+            setTimeout(() => alert.remove(), 500);
+          }
         }, 3000);
-    </script>
-@endif
+      </script>
+    @endif
     <!-- Filter + Table -->
     <div class="card p-4">
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -265,8 +265,7 @@
                         @foreach ($app->documents as $doc)
                           <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span class="text-capitalize">{{ $doc->type }}</span>
-                            <a href="{{ asset($doc->path) }}" target="_blank"
-                              class="btn btn-sm btn-outline-secondary">
+                            <a href="{{ asset($doc->path) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
                               <i class="bi bi-box-arrow-up-right"></i> Buka
                             </a>
                           </li>
@@ -303,51 +302,56 @@
                         <div class="col-md-6">
                           <label class="form-label fw-semibold">Email Aktif</label>
                           <input type="email" name="active_email" class="form-control" value="{{ $app->active_email }}"
-                            disabled>
+                            readonly>
                         </div>
 
                         <div class="col-md-6">
                           <label class="form-label fw-semibold">Nomor WhatsApp</label>
                           <input type="text" name="whatsapp_number" class="form-control"
-                            value="{{ $app->whatsapp_number }}" disabled>
+                            value="{{ $app->whatsapp_number }}" readonly>
                         </div>
 
                         <div class="col-md-6">
                           <label class="form-label fw-semibold">Durasi Magang</label>
-                          <input type="text" name="duration" class="form-control" value="{{ $app->duration }}" disabled>
+                          <input type="text" name="duration" class="form-control" value="{{ $app->duration }}" readonly>
                         </div>
 
                         <div class="col-md-6">
                           <label class="form-label fw-semibold">Status</label>
-                          <select name="status" class="form-select" id="statusSelect{{ $app->id }}">
-                            <option value="submitted" {{ $app->status == 'submitted' ? 'selected' : '' }}>Dikirim</option>
+                          <select name="status" class="form-select status-select" data-app-id="{{ $app->id }}">
+                            
                             <option value="under_review" {{ $app->status == 'under_review' ? 'selected' : '' }}>Sedang
                               Ditinjau</option>
-                            <option value="interview" {{ $app->status == 'interview' ? 'selected' : '' }}>Wawancara Terjadwal</option>
+                            <option value="interview" {{ $app->status == 'interview' ? 'selected' : '' }}>Wawancara
+                              Terjadwal</option>
                             <option value="accepted" {{ $app->status == 'accepted' ? 'selected' : '' }}>Diterima</option>
                             <option value="rejected" {{ $app->status == 'rejected' ? 'selected' : '' }}>Ditolak</option>
-                            <option value="completed" {{ $app->status == 'completed' ? 'selected' : '' }}>Selesai</option>
                             <option value="active" {{ $app->status == 'active' ? 'selected' : '' }}>Aktif</option>
                           </select>
                         </div>
 
                         <div class="col-12">
                           <label class="form-label fw-semibold">Motivasi</label>
-                          <textarea disabled name="motivation" class="form-control" rows="3">{{ $app->motivation }}</textarea>
+                          <textarea name="motivation" class="form-control" rows="3"
+                            readonly>{{ $app->motivation }}</textarea>
                         </div>
 
                         <!-- === Penilaian Seleksi === -->
                         <div class="col-12 mt-3 border-top pt-3">
-                          <h6 class="fw-bold"><i class="bi bi-clipboard-check text-success me-2"></i> Penilaian Seleksi
+                          <h6 class="fw-bold"><i class="bi bi-clipboard-check text-success me-2"></i> Penilaian Seleksi Berkas
                           </h6>
                           <div class="row g-3">
                             <div class="col-md-4">
-                              <label class="form-label">Nilai</label>
+                              <label class="form-label">Nilai
+                                <span class="text-danger">*</span>
+                              </label>
                               <input type="number" name="score" class="form-control"
-                                value="{{ $app->selection->score ?? '' }}">
+                                value="{{ $app->selection->score ?? '' }}" min="0" max="100">
                             </div>
                             <div class="col-md-4">
-                              <label class="form-label">Hasil</label>
+                              <label class="form-label">Hasil
+                                <span class="text-danger">*</span>
+                              </label>
                               <select name="result" class="form-select">
                                 <option value="pending" {{ optional($app->selection)->result == 'pending' ? 'selected' : '' }}>Menunggu</option>
                                 <option value="passed" {{ optional($app->selection)->result == 'passed' ? 'selected' : '' }}>Lulus</option>
@@ -362,18 +366,22 @@
                           </div>
                         </div>
 
-                        <!-- === Jadwal Wawancara (Muncul Jika Status = interview) === -->
+                        <!-- === Jadwal Wawancara === -->
                         <div class="col-12 mt-3 border-top pt-3 interview-section" id="interviewSection{{ $app->id }}"
-                          style="display: none;">
+                          style="display: {{ $app->status == 'interview' ? 'block' : 'none' }};">
                           <h6 class="fw-bold"><i class="bi bi-calendar-event text-info me-2"></i> Jadwal Wawancara</h6>
                           <div class="row g-3">
                             <div class="col-md-6">
-                              <label class="form-label">Tanggal & Waktu</label>
+                              <label class="form-label">Tanggal & Waktu
+                                <span class="text-danger">*</span>
+                              </label>
                               <input type="datetime-local" name="scheduled_at" class="form-control"
                                 value="{{ optional($app->interview)->scheduled_at ? \Carbon\Carbon::parse($app->interview->scheduled_at)->format('Y-m-d\TH:i') : '' }}">
                             </div>
                             <div class="col-md-6">
-                              <label class="form-label">Status Wawancara</label>
+                              <label class="form-label">Status Wawancara
+                                <span class="text-danger">*</span>
+                              </label>
                               <select name="interview_status" class="form-select">
                                 <option value="scheduled" {{ optional($app->interview)->status == 'scheduled' ? 'selected' : '' }}>Dijadwalkan</option>
                                 <option value="done" {{ optional($app->interview)->status == 'done' ? 'selected' : '' }}>
@@ -382,7 +390,7 @@
                               </select>
                             </div>
                             <div class="col-md-12">
-                              <label class="form-label">Hasil / Catatan Wawancara</label>
+                              <label class="form-label">Catatan</label>
                               <textarea name="interview_result" class="form-control"
                                 rows="2">{{ $app->interview->result ?? '' }}</textarea>
                             </div>
@@ -448,6 +456,7 @@
         ordering: true,
         info: true,
         pageLength: 10,
+        order: [[7, 'desc']],
         language: {
           search: "Cari:",
           lengthMenu: "Tampilkan _MENU_ entri per halaman",
@@ -462,23 +471,62 @@
       });
     });
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Ambil semua elemen select status berdasarkan class
+      document.querySelectorAll('.status-select').forEach(select => {
+        const appId = select.getAttribute('data-app-id');
+        const interviewSection = document.getElementById('interviewSection' + appId);
+    
+        function toggleInterviewSection() {
+          if (!interviewSection) return;
+          interviewSection.style.display = select.value === 'interview' ? 'block' : 'none';
+        }
+    
+        // Jalankan pertama kali ketika modal dibuka
+        toggleInterviewSection();
+    
+        // Jalankan setiap kali status diganti
+        select.addEventListener('change', toggleInterviewSection);
+      });
+    });
+  </script>
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // Ambil semua elemen select status yang ada di halaman
-    document.querySelectorAll('[id^="statusSelect"]').forEach(select => {
-      const appId = select.id.replace('statusSelect', '');
-      const interviewSection = document.getElementById('interviewSection' + appId);
+  document.addEventListener('DOMContentLoaded', function() {
+    // Tangkap semua select status
+    document.querySelectorAll('.status-select').forEach(function(select) {
+      const appId = select.getAttribute('data-app-id');
 
-      function toggleInterviewSection() {
-        if (!interviewSection) return;
-        interviewSection.style.display = select.value === 'interview' ? 'block' : 'none';
-      }
+      // Fungsi untuk toggle readonly Penilaian Seleksi
+      const toggleSelectionReadonly = () => {
+        const status = select.value;
+        const modal = document.querySelector(`#editAppModal${appId}`);
+        const scoreInput = modal.querySelector('input[name="score"]');
+        const resultSelect = modal.querySelector('select[name="result"]');
+        const remarksTextarea = modal.querySelector('textarea[name="remarks"]');
 
-      // Jalankan pertama kali ketika modal dibuka
-      toggleInterviewSection();
+        const isReadonly = status !== 'under_review';
 
-      // Jalankan setiap kali status diganti
-      select.addEventListener('change', toggleInterviewSection);
+        // Disable semua input penilaian
+        scoreInput.readOnly = isReadonly;
+        resultSelect.disabled = isReadonly;
+        remarksTextarea.readOnly = isReadonly;
+
+        // Tambahkan gaya visual agar terlihat nonaktif
+        [scoreInput, resultSelect, remarksTextarea].forEach(el => {
+          if (isReadonly) {
+            el.classList.add('bg-light');
+          } else {
+            el.classList.remove('bg-light');
+          }
+        });
+      };
+
+      // Jalankan saat pertama kali modal dimuat
+      toggleSelectionReadonly();
+
+      // Jalankan setiap kali status berubah
+      select.addEventListener('change', toggleSelectionReadonly);
     });
   });
 </script>

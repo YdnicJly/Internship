@@ -84,7 +84,7 @@ public function index()
     // Terakhir, hapus user
     $intern->delete();
 
-    return redirect()->back()->with('success', 'Data Pemagang Berhasil dihapus.');
+    return redirect()->back()->with('success', 'Intern has been deleted successfully.');
 }
 public function storeEvaluation(Request $request, $id)
 {
@@ -99,57 +99,27 @@ public function storeEvaluation(Request $request, $id)
 
     $intern = User::findOrFail($id);
 
-    // ✅ Pastikan kolom user_id selalu terisi (penting!)
-    $validated['user_id'] = $intern->id;
+    $intern->evaluations()->create($validated);
 
-    // ✅ Update jika sudah ada, buat baru jika belum ada
-    $intern->evaluations()->updateOrCreate(
-        ['user_id' => $intern->id],  // Kondisi pencarian
-        $validated                   // Data untuk update/create
-    );
-
-    return redirect()->back()->with('success', 'Evaluasi berhasil disimpan.');
+    return redirect()->back()->with('success', 'Evaluasi berhasil ditambahkan.');
 }
-
 
 public function storeCertificate(Request $request, $id)
 {
     $validated = $request->validate([
         'certificate_file' => 'required|mimes:pdf|max:2048',
-    ], [
-        'certificate_file.required' => 'File sertifikat wajib diunggah.',
-        'certificate_file.mimes' => 'Format file harus PDF.',
-        'certificate_file.max' => 'Ukuran file maksimal 2MB.',
     ]);
 
     $intern = User::findOrFail($id);
 
-    $destinationPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/certificates';
+    if ($request->hasFile('certificate_file')) {
+        $path = $request->file('certificate_file')->store('certificates', 'public');
 
-    if (!file_exists($destinationPath)) {
-        mkdir($destinationPath, 0755, true);
-    }
-
-    // 🔹 Hapus sertifikat lama kalau sudah ada
-    if ($intern->certificate && file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $intern->certificate->file_path)) {
-        unlink($_SERVER['DOCUMENT_ROOT'] . '/' . $intern->certificate->file_path);
-    }
-
-    // 🔹 Simpan file baru
-    $file = $request->file('certificate_file');
-    $filename = 'certificate_' . str_replace(' ', '_', strtolower($intern->name)) . '_' . time() . '.pdf';
-    $file->move($destinationPath, $filename);
-
-    $relativePath = 'certificates/' . $filename;
-
-    // 🔄 Update atau buat baru
-    $intern->certificate()->updateOrCreate(
-        ['user_id' => $intern->id],
-        [
-            'file_path' => $relativePath,
+        $intern->certificate()->create([
+            'file_path' => $path,
             'issued_date' => now(),
-        ]
-    );
+        ]);
+    }
 
     return redirect()->back()->with('success', 'Sertifikat berhasil diupload.');
 }

@@ -205,13 +205,17 @@
               @method('PUT')
               <div class="modal-body">
                 <div class="mb-3">
-                  <label class="form-label">Tanggal Wawancara</label>
+                  <label class="form-label">Tanggal Wawancara
+                    <span class="text-danger">*</span>
+                  </label>
                   <input type="datetime-local" name="scheduled_at" class="form-control"
                     value="{{ $interview->scheduled_at ? \Carbon\Carbon::parse($interview->scheduled_at)->format('Y-m-d\TH:i') : '' }}"
                     required>
                 </div>
                 <div class="mb-3">
-                  <label class="form-label">Status</label>
+                  <label class="form-label">Status
+                    <span class="text-danger">*</span>
+                  </label>
                   <select name="status" class="form-select" required>
                     <option value="scheduled" {{ $interview->status == 'scheduled' ? 'selected' : '' }}>Dijadwalkan</option>
                     <option value="done" {{ $interview->status == 'done' ? 'selected' : '' }}>Selesai</option>
@@ -219,7 +223,9 @@
                   </select>
                 </div>
                 <div class="mb-3">
-                  <label class="form-label">Hasil</label>
+                  <label class="form-label">Hasil
+                    <span class="text-danger">*</span>
+                  </label>
                   <input type="text" name="result" class="form-control" value="{{ $interview->result }}"
                     placeholder="Contoh: Lulus, Tidak Lulus, dll.">
                 </div>
